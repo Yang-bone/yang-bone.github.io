@@ -1,0 +1,1 @@
+var e=()=>!!document.querySelector(`[name="astro-view-transitions-enabled"]`);window.addEventListener(`load`,()=>{e()||document.dispatchEvent(new Event(`astro:page-load`))});
