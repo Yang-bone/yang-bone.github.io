@@ -1,23 +1,92 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
     <head>
         <style>
+            @font-face {
+                font-family: 'Alphacentauri-MVY4p';
+                src: url('Alphacentauri-MVY4p.ttf') format('truetype');
+            }
+            @font-face {
+                font-family: 'Adofai';
+                src: url('adofai.otf') format('opentype');
+            }
+            @font-face {
+                font-family: 'Adofai2';
+                src: url('adofai 2.ttf') format('truetype');
+            }
             body {
                 font-family: Arial, sans-serif;
-                background-color: #000000;
-                margin: 20px;
+                background-image: url('yue.jpg');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                margin: 0;
+                padding: 20px;
+                position: relative;
+            }
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                pointer-events: none;
+                background: linear-gradient(
+                    to bottom,
+                    rgba(0, 0, 0, 0.8) 0%,
+                    transparent 15%,
+                    transparent 85%,
+                    rgba(0, 0, 0, 0.8) 100%
+                );
+                z-index: -1;
+            }
+            body > * {
+                position: relative;
+                z-index: auto;
+            }
+            .new-btn {
+                position: fixed !important;
+                z-index: 999 !important;
             }
             h1 {
                 color: #0051ff;
                 text-align: center;
-                font-family: 'Arial Black', sans-serif;
+                font-family: 'Alphacentauri-MVY4p', sans-serif;
                 text-shadow: 0 0 80px #00aeff;
+            }
+            .intro-row {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                margin: 20px 0;
+                position: relative;
+            }
+            .old-page {
+                color: #3E2962;
+                text-align: left;
+                font-size: 24px;
+                text-shadow: 0 0 60px #3E2962;
+                background-color: #D39CB9;
+                padding: 10px 10px;
+                border-radius: 8px;
+                margin: 0;
+                position: absolute;
+                left: 0;
+                font-family: 'Adofai2', sans-serif;
             }
             p {
                 color: #666;
                 text-align: center;
                 font-size: 20px;
                 text-shadow: 0 0 60px #6d6d6d;
+                margin: 0;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                font-family: 'Adofai2', sans-serif;
             }
             img[src="tou.png"] {
                 display: block;
@@ -25,7 +94,7 @@
                 width: 200px;
                 height: 200px;
                 border-radius: 50%;
-                box-shadow: 0 0 20px #00aeff;
+                box-shadow: 0 0 20px #3E2962;
                 border: #ffffff solid 5px;
             }
             a {
@@ -33,15 +102,42 @@
                 text-align: center;
                 margin-top: 20px;
                 font-size: 18px;
-                color: #00aeff;
+                color: #D39CB9;
                 text-decoration: none;
-                text-shadow: 0 0 60px #00aeff;
+                text-shadow: 0 0 60px #3E2962;
+                font-family: 'Adofai2', sans-serif;
+            }
+            .new-btn {
+                position: fixed !important;
+                top: 20px;
+                right: 20px;
+                display: inline-block;
+                margin-top: 0;
+                padding: 10px 16px;
+                background: linear-gradient(135deg, #3E2962, #D39CB9);
+                color: #ffffff;
+                border-radius: 999px;
+                font-weight: bold;
+                box-shadow: 0 0 15px #D39CB9;
+                z-index: 999 !important;
+                font-family: 'Adofai', sans-serif;
+            }
+            .new-btn:hover {
+                transform: scale(1.05);
             }
             h3 {
-                color: #00ff55;
+                color: #3a137c;
                 text-align: center;
                 font-size: 24px;
-                text-shadow: 0 0 60px #00ff55;
+                text-shadow: 0 0 60px #3E2962;
+                font-family: 'Adofai2', sans-serif;
+            }
+            h1[class="lines"] {
+                color: #3E2962;
+                text-align: center;
+                font-size: 24px;
+                text-shadow: 0 0 60px #3E2962;
+                font-family: 'Adofai2', sans-serif;
             }
             img[src="h.jpg"] {
                 border-radius: 20%;
@@ -67,42 +163,56 @@
                 width: 100%;
                 height: 100%;
             }
+            a[class="icp-link"] {
+                display: block;
+                text-align: center;
+                margin-top: 20px;
+                font-size: 14px;
+                color: #D39CB9;
+                text-decoration: none;
+                text-shadow: 0 0 60px #3E2962;
+                font-family: 'Adofai', sans-serif;
+            }
         </style>
         <title>About Yang_bone</title>
     </head>
 
 
     <body>
+        <a class="new-btn" href="http://yang-bone666.j3.ink/new">New</a>
         <h1>About Me(Yang_bone)</h1>
-        <p>Welcome to my website!</p>
+        <div class="intro-row">
+            <h3 class="old-page">Old page</h3>
+            <p>Welcome to my website!</p>
+        </div>
         <img src="tou.png" alt="Tou Image">
         <h3>我的帐号:</h3>
         <a href="https://www.ccw.site/student/6540f18c1ddb475eb21f6948">🛠️My CCW Profile🛠️
         </a>
         <a href="https://www.ccw.site/student/6540f18c1ddb475eb21f6948">🛠️我的CCW资料页面🛠️
         </a>
-        <h1>-----------------------------------------------------------------------</h1>
+        <h1 class="lines">--------------------------------------------------------------</h1>
         <a href="https://www.kuaishou.com/profile/3xk5msg2bdegdzc"
         >▶️My Kuaishou Profile▶️
         </a>
         <a href="https://www.kuaishou.com/profile/3xk5msg2bdegdzc">▶️我的快手资料页面▶️
         </a>
-        <h1>-----------------------------------------------------------------------</h1>
+        <h1 class="lines">--------------------------------------------------------------</h1>
         <a href="https://space.bilibili.com/3546611758140340">👁️‍🗨️My Bilibili Profile👁️‍🗨️
             </a>
         <a href="https://space.bilibili.com/3546611758140340">👁️‍🗨️我的B站资料页面👁️‍🗨️
         </a>
-        <h1>-----------------------------------------------------------------------</h1>
+        <h1 class="lines">--------------------------------------------------------------</h1>
         <a href="https://github.com/Yang-bone">😸My GitHub Profile😸
             </a>
         <a href="https://github.com/Yang-bone">😸我的GitHub资料页面😸
         </a>
-        <h1>-----------------------------------------------------------------------</h1>
+        <h1 class="lines">---------------------------------------------------------------</h1>
         <a href="https://create.codelab.club/users/Yang_b1/">🔔My Codelab Profile🔔
         </a>
         <a href="https://create.codelab.club/users/Yang_b1/">🔔我的Codelab资料页面🔔
         </a>
-        <h1>-----------------------------------------------------------------------</h1>
+        <h1 class="lines">---------------------------------------------------------------</h1>
         <a href="https://qm.qq.com/q/IDxHeQaXFS">🐧My QQ Profile🐧
         </a>
         <a href="https://qm.qq.com/q/IDxHeQaXFS">🐧我的QQ资料页面🐧
@@ -117,6 +227,7 @@
         <h1> </h1>
         <h1> </h1>
         <h1> </h1>
+        <a class="icp-link" href="https://icp.gov.moe/?keyword=20264052" target="_blank">萌ICP备20264052号</a>
         <script>
             // 获取所有的 <a> 标签（改名为避免重复）
             const linkElems = document.querySelectorAll('a');
