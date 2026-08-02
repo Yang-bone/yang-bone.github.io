@@ -3,7 +3,262 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Yang_bone</title>
+        <title>Yang_bone的项目</title>
+        <script type="module" src="index.js"></script>
+        <style>
+            @font-face {
+                font-family: 'Adofai 2';
+                src: url('project/adofai 2.ttf') format('truetype');
+            }
+            html, body {
+                width: 100%;
+                min-height: 100%;
+                margin: 0;
+                padding: 0;
+                background-color: #000;
+            }
+            body {
+                background-image: url("https://api.yppp.net/api.php");
+                background-size: cover;
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                min-height: 100vh;
+                height: 100vh;
+                font-family: 'Adofai 2', sans-serif;
+                padding: 2rem;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            .center-wrap {
+                width: 100%;
+                max-width: 980px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                margin-top: calc(50vh - 5rem);
+                transition: margin-top 0.6s ease;
+            }
+            .center-wrap.open {
+                margin-top: 2rem;
+            }
+            h1 {
+                display: inline-block;
+                margin: 0;
+                padding: 1rem 1.5rem;
+                color: #000000;
+                font-size: 3rem;
+                font-family: 'Adofai 2', sans-serif;
+                background: rgba(255, 255, 255, 0.18);
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                border-radius: 28px;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+                text-align: center;
+                white-space: nowrap;
+                cursor: pointer;
+                animation: floatIdle 4s ease-in-out infinite;
+                transition: transform 0.6s ease, opacity 0.6s ease;
+            }
+            h1.title-exiting {
+                animation: none;
+                transform: translateY(-180%);
+                opacity: 0;
+            }
+            #menu {
+                opacity: 0;
+                transform: translateY(0);
+                max-height: 0;
+                overflow: hidden;
+                margin-top: 2rem;
+                max-width: 980px;
+                width: 100%;
+                padding: 0 1.25rem;
+                background: rgba(255, 255, 255, 0.82);
+                border: 1px solid rgba(0, 0, 0, 0.12);
+                border-radius: 28px;
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+                color: #111;
+                pointer-events: none;
+                transition: opacity 0.45s ease, max-height 0.45s ease, padding 0.45s ease;
+            }
+            #menu.show {
+                opacity: 1;
+                max-height: 1200px;
+                padding: 1.5rem 1.25rem;
+                pointer-events: auto;
+            }
+            #menu.closing {
+                opacity: 0;
+                transform: translateY(120px);
+                max-height: 0;
+                padding: 0 1.25rem;
+                pointer-events: none;
+            }
+            .center-wrap #menu {
+                margin-top: 2rem;
+            }
+            .menu-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.25rem;
+            }
+            #menu h2 {
+                margin: 0;
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+            .menu-toggle {
+                border: none;
+                background: rgba(0, 0, 0, 0.08);
+                color: #111;
+                border-radius: 999px;
+                padding: 0.5rem 0.9rem;
+                cursor: pointer;
+                font-size: 0.95rem;
+            }
+            .project-grid {
+                display: grid;
+                gap: 1rem;
+                grid-template-columns: repeat(4, minmax(220px, 1fr));
+                justify-items: center;
+                align-items: stretch;
+            }
+            @media (max-width: 1120px) {
+                .project-grid {
+                    grid-template-columns: repeat(3, minmax(220px, 1fr));
+                }
+            }
+            @media (max-width: 860px) {
+                .project-grid {
+                    grid-template-columns: repeat(2, minmax(220px, 1fr));
+                }
+            }
+            @media (max-width: 580px) {
+                .project-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+            .project-card {
+                background: rgba(255, 255, 255, 0.95);
+                border: 1px solid rgba(0, 0, 0, 0.08);
+                border-radius: 22px;
+                overflow: hidden;
+                box-shadow: 0 16px 30px rgba(0,0,0,0.12);
+                backdrop-filter: blur(10px);
+                transition: transform 0.3s ease, border-color 0.3s ease;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+            }
+            .project-card:hover {
+                transform: translateY(-6px);
+                border-color: rgba(0, 0, 0, 0.2);
+            }
+            .project-card img {
+                width: 100%;
+                height: 140px;
+                object-fit: cover;
+                display: block;
+            }
+            .project-card .project-body {
+                padding: 1rem;
+                text-align: left;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            .project-card h3 {
+                margin: 0 0 0.5rem;
+                font-size: 1.15rem;
+            }
+            .project-card p {
+                margin: 0;
+                color: rgba(0, 0, 0, 0.72);
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
+            .project-card .project-tag {
+                margin-top: 1rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                padding: 0.4rem 0.75rem;
+                border-radius: 999px;
+                background: rgba(0,0,0,0.08);
+                color: #111;
+                font-size: 0.85rem;
+                align-self: flex-start;
+            }
+            @keyframes floatIdle {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+            }
+        </style>
     </head>
     <body>
+        <div class="center-wrap">
+            <a href="https://yang-bone.github.io/new">返回</a>
+            <h1 id="pageTitle">这里是Yang_bone的项目</h1>
+            <div id="menu">
+                <div class="menu-header">
+                    <h2>我的项目</h2>
+                    <button class="menu-toggle" type="button">收起</button>
+                </div>
+                <div class="project-grid">
+                    <div class="project-card">
+                        <img src="https://via.placeholder.com/420x140.png?text=项目+1" alt="项目1">
+                        <div class="project-body">
+                            <div>
+                                <h3>项目 1</h3>
+                                <p>这是项目 1 的简介，适合显示图片、描述和入口按钮。</p>
+                            </div>
+                            <span class="project-tag">图片项目</span>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://via.placeholder.com/420x140.png?text=项目+2" alt="项目2">
+                        <div class="project-body">
+                            <div>
+                                <h3>项目 2</h3>
+                                <p>这是项目 2 的简介，卡片排布更适合多个项目展示。</p>
+                            </div>
+                            <span class="project-tag">小游戏</span>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://via.placeholder.com/420x140.png?text=项目+3" alt="项目3">
+                        <div class="project-body">
+                            <div>
+                                <h3>项目 3</h3>
+                                <p>你可以把后续项目也放在这里，自动响应排列。</p>
+                            </div>
+                            <span class="project-tag">工具</span>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://via.placeholder.com/420x140.png?text=项目+4" alt="项目4">
+                        <div class="project-body">
+                            <div>
+                                <h3>项目 4</h3>
+                                <p>每个小方块都可以用于展示不同类型的项目内容。</p>
+                            </div>
+                            <span class="project-tag">演示</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
+</html>
