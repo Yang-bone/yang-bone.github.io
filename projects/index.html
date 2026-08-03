@@ -35,15 +35,30 @@
                 overflow-y: auto;
                 overflow-x: hidden;
             }
-            a {
-                text-align: left;
+            #returnLink {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 20;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.55rem 0.9rem;
                 border: 1px solid rgba(255, 255, 255, 0.4);
-                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-                background: rgba(255, 255, 255, 0.18);
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.9);
+                color: #111;
+                text-decoration: none;
+                box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
                 font-family: 'Adofai 2', sans-serif;
-                top: 0%;
+                transition: transform 0.2s ease, background 0.2s ease;
+            }
+            #returnLink:hover {
+                transform: translateY(-1px);
+                background: rgba(255, 255, 255, 1);
             }
             .center-wrap {
+                position: relative;
                 width: 100%;
                 max-width: 980px;
                 display: flex;
@@ -51,10 +66,6 @@
                 align-items: center;
                 text-align: center;
                 margin-top: calc(50vh - 5rem);
-                transition: margin-top 0.6s ease;
-            }
-            .center-wrap.open {
-                margin-top: 2rem;
             }
             h1 {
                 display: inline-block;
@@ -81,39 +92,37 @@
                 opacity: 0;
             }
             #menu {
+                position: fixed;
+                top: 11rem;
+                left: 50%;
+                transform: translate(-50%, -20px);
                 opacity: 0;
-                transform: translateY(0);
-                max-height: 0;
-                overflow: hidden;
-                margin-top: 2rem;
+                visibility: hidden;
+                width: calc(100% - 2rem);
                 max-width: 980px;
-                width: 100%;
-                padding: 0 1.25rem;
-                background: rgba(255, 255, 255, 0.82);
+                padding: 1.5rem 1.25rem;
+                background: rgba(255, 255, 255, 0.92);
                 border: 1px solid rgba(0, 0, 0, 0.12);
                 border-radius: 28px;
                 backdrop-filter: blur(16px);
                 -webkit-backdrop-filter: blur(16px);
                 box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
                 color: #111;
+                z-index: 10;
                 pointer-events: none;
-                transition: opacity 0.45s ease, max-height 0.45s ease, padding 0.45s ease;
+                transition: opacity 0.45s ease, transform 0.45s ease;
             }
             #menu.show {
                 opacity: 1;
-                max-height: 1200px;
-                padding: 1.5rem 1.25rem;
+                visibility: visible;
+                transform: translate(-50%, 0);
                 pointer-events: auto;
             }
             #menu.closing {
                 opacity: 0;
-                transform: translateY(120px);
-                max-height: 0;
-                padding: 0 1.25rem;
+                visibility: hidden;
+                transform: translate(-50%, -20px);
                 pointer-events: none;
-            }
-            .center-wrap #menu {
-                margin-top: 2rem;
             }
             .menu-header {
                 display: flex;
@@ -217,7 +226,7 @@
     </head>
     <body>
         <div class="center-wrap">
-            <a href="https://yang-bone.github.io/new" scr='back'>返回</a>
+            <a id="returnLink" href="https://yang-bone.github.io/new">返回</a>
             <h1 id="pageTitle">这里是Yang_bone的项目</h1>
             <div id="menu">
                 <div class="menu-header">
@@ -229,10 +238,10 @@
                         <img src="https://via.placeholder.com/420x140.png?text=项目+1" alt="项目1">
                         <div class="project-body">
                             <div>
-                                <h3>项目 1</h3>
+                                <h3>奶娃喝水</h3>
                                 <p>无</p>
                             </div>
-                            <span class="project-tag">图片项目</span>
+                            <span class="project-tag">AI项目</span>
                         </div>
                     </div>
                     <div class="project-card">
