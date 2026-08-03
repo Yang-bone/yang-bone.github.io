@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词消除游戏</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1', // 主色调：靛蓝色
+                        secondary: '#10b981', // 辅助色：绿色（正确）
+                        danger: '#ef4444', // 错误色：红色
+                        neutral: '#64748b', // 中性色：灰色
+                        light: '#f8fafc', // 浅色背景
+                    },
+                    fontFamily: {
+                        game: ['"Comic Sans MS"', '"Marker Felt"', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .word-card {
+                @apply bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl;
+            }
+            .btn-game {
+                @apply font-bold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2;
+            }
+            .input-char {
+                @apply w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-lg mx-1 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all;
+            }
+            .char-display {
+                @apply w-12 h-12 flex items-center justify-center text-xl font-bold mx-1;
+            }
+            .level-btn {
+                @apply w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-lg cursor-pointer transition-all duration-200 hover:bg-primary/80 hover:scale-110 active:scale-95;
+            }
+            .close-btn {
+                @apply absolute top-4 left-4 w-10 h-10 rounded-full bg-neutral/20 hover:bg-neutral/40 text-neutral flex items-center justify-center text-xl transition-all z-30;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-purple-100 min-h-screen font-game text-gray-800 overflow-x-hidden">
+    <!-- 选关覆盖层（白布）- 层级最低 -->
+    <div id="level-select-overlay" class="fixed inset-0 bg-white z-10 transform -translate-x-full transition-transform duration-700 ease-in-out origin-left"></div>
+    
+    <!-- 选关面板 - 层级高于白布 -->
+    <div id="level-select-panel" class="fixed inset-0 z-20 transform -translate-x-full transition-transform duration-700 ease-in-out origin-left flex flex-col items-center justify-center p-6">
+        <!-- 左上角关闭按钮 - 层级最高 -->
+        <div id="close-btn-top" class="close-btn">
+            <i class="fa fa-times"></i>
+        </div>
+        
+        <h2 class="text-3xl font-bold text-primary mb-8 mt-8">选择关卡</h2>
+        <div id="level-grid" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-3 max-w-3xl w-full"></div>
+        <button id="close-level-select" class="mt-8 btn-game bg-neutral hover:bg-neutral/80 text-white">
+            <i class="fa fa-times mr-2"></i>关闭
+        </button>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-4xl relative z-5">
+        <!-- 游戏标题 -->
+        <header class="text-center mb-8">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-primary mb-2 tracking-wider">
+                <i class="fa fa-puzzle-piece mr-3"></i>单词消除
+            </h1>
+            <p class="text-neutral text-lg max-w-2xl mx-auto">
+                每个单词缺少1-2个字符，填入正确字符即可消除该单词并得分！
+            </p>
+        </header>
+        
+        <!-- 游戏状态 -->
+        <div class="flex flex-wrap justify-between items-center mb-8 bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md">
+            <div class="flex items-center flex-wrap mb-4 md:mb-0">
+                <div class="mr-6">
+                    <p class="text-neutral text-sm">得分</p>
+                    <p id="score" class="text-2xl font-bold text-primary">0</p>
+                </div>
+                <div class="mr-6">
+                    <p class="text-neutral text-sm">当前关卡</p>
+                    <p id="level" class="text-2xl font-bold text-primary">1</p>
+                    <p id="level-detail" class="text-sm text-neutral">1-1</p> <!-- 关卡细分显示 -->
+                </div>
+                <div class="mr-6">
+                    <p class="text-neutral text-sm">难度</p>
+                    <p id="difficulty" class="text-2xl font-bold text-primary">简单</p>
+                </div>
+                <div>
+                    <p class="text-neutral text-sm">语言</p>
+                    <p id="language" class="text-2xl font-bold text-primary">中文</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button id="level-select-btn" class="btn-game bg-purple-500 hover:bg-purple-600 text-white focus:ring-purple-500/50 flex items-center">
+                    <i class="fa fa-th mr-2"></i>选关
+                </button>
+                <button id="restart-btn" class="btn-game bg-primary hover:bg-primary/90 text-white focus:ring-primary/50 flex items-center">
+                    <i class="fa fa-refresh mr-2"></i>重新开始
+                </button>
+                <button id="hint-btn" class="btn-game bg-amber-500 hover:bg-amber-600 text-white focus:ring-amber-500/50 flex items-center">
+                    <i class="fa fa-lightbulb-o mr-2"></i>提示
+                </button>
+            </div>
+        </div>
+        
+        <!-- 主游戏区域 -->
+        <main class="mb-8">
+            <div id="game-container" class="flex flex-col items-center justify-center">
+                <!-- 单词卡片 -->
+                <div id="word-card" class="word-card w-full max-w-lg mb-8 transform transition-all duration-500">
+                    <!-- 单词提示 -->
+                    <div id="word-hint" class="text-center text-neutral mb-4 min-h-[30px] italic">
+                        <!-- 提示信息将在这里显示 -->
+                    </div>
+                    
+                    <div id="word-display" class="flex justify-center mb-6 min-h-[60px]">
+                        <!-- 单词字符将在这里动态生成 -->
+                    </div>
+                    
+                    <!-- 输入区域 -->
+                    <div id="input-container" class="flex justify-center mb-6">
+                        <!-- 输入框将在这里动态生成 -->
+                    </div>
+                    
+                    <!-- 提交按钮 -->
+                    <div class="text-center">
+                        <button id="submit-btn" class="btn-game bg-primary hover:bg-primary/90 text-white w-full md:w-auto px-8 focus:ring-primary/50">
+                            <i class="fa fa-check mr-2"></i>提交答案
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 提示信息 -->
+                <div id="message" class="text-center text-lg font-medium mb-4 transition-all duration-300 opacity-0 transform translate-y-2"></div>
+            </div>
+        </main>
+        
+        <!-- 游戏说明 -->
+        <footer class="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-md">
+            <h2 class="text-xl font-bold mb-3 text-primary">游戏说明</h2>
+            <ul class="list-disc list-inside space-y-2 text-neutral">
+                <li>每个单词会缺少1-2个字符</li>
+                <li>在输入框中填入正确的字符</li>
+                <li>提交正确答案可消除单词并获得分数</li>
+                <li>难度分为：简单、中等、困难，随关卡提升</li>
+                <li>达到第10关后将解锁英语单词关卡</li>
+                <li>使用提示会消耗5分，但能获得一个正确字符</li>
+            </ul>
+        </footer>
+    </div>
+
+    <script>
+        // 游戏数据和状态
+        const gameState = {
+            score: 0,
+            level: 1,
+            levelProgress: 1, // 当前关卡的第几个题目
+            levelTotal: 5, // 每个关卡包含的题目数量
+            currentWord: '',
+            currentHint: '',
+            hiddenIndices: [],
+            hintsUsed: 0,
+            language: 'chinese', // 'chinese' 或 'english'
+            difficulty: 1, // 1:简单, 2:中等, 3:困难
+            shownEnglishHint: false, // 是否已显示英语关卡提示
+            // 中文单词库按难度分级
+            chineseWords: [
+                // 初级词汇（1-3关）- 2-3个字符
+                { word: '苹果', hint: '一种水果，红色或绿色', difficulty: 1 },
+                { word: '香蕉', hint: '长条形，黄色的水果', difficulty: 1 },
+                { word: '橙子', hint: '圆形，橙色的水果', difficulty: 1 },
+                { word: '草莓', hint: '红色，表面有小籽的水果', difficulty: 1 },
+                { word: '西瓜', hint: '夏天常见的大型水果', difficulty: 1 },
+                { word: '桌子', hint: '用来放东西的家具', difficulty: 1 },
+                { word: '椅子', hint: '用来坐的家具', difficulty: 1 },
+                { word: '书本', hint: '里面有文字和图片', difficulty: 1 },
+                { word: '铅笔', hint: '用来写字的工具', difficulty: 1 },
+                { word: '橡皮', hint: '可以擦掉铅笔字迹', difficulty: 1 },
+                { word: '学校', hint: '学习的地方', difficulty: 1 },
+                { word: '老师', hint: '在学校教学生的人', difficulty: 1 },
+                { word: '学生', hint: '在学校学习的人', difficulty: 1 },
+                { word: '妈妈', hint: '父亲的妻子', difficulty: 1 },
+                { word: '爸爸', hint: '母亲的丈夫', difficulty: 1 },
+                
+                // 中级词汇（4-6关）- 2-4个字符
+                { word: '计算机', hint: '可以用来上网、工作的电子设备', difficulty: 2 },
+                { word: '电视机', hint: '可以看节目和电影的设备', difficulty: 2 },
+                { word: '电话', hint: '用来远距离通话的设备', difficulty: 2 },
+                { word: '手表', hint: '戴在手腕上看时间的物品', difficulty: 2 },
+                { word: '眼镜', hint: '帮助视力不好的人看清东西', difficulty: 2 },
+                { word: '医院', hint: '生病时去的地方', difficulty: 2 },
+                { word: '银行', hint: '可以存钱取钱的地方', difficulty: 2 },
+                { word: '商店', hint: '可以买东西的地方', difficulty: 2 },
+                { word: '公园', hint: '可以散步、玩耍的公共场所', difficulty: 2 },
+                { word: '汽车', hint: '一种交通工具', difficulty: 2 },
+                { word: '火车', hint: '在铁轨上行驶的交通工具', difficulty: 2 },
+                { word: '飞机', hint: '在天上飞的交通工具', difficulty: 2 },
+                { word: '音乐', hint: '好听的声音组合', difficulty: 2 },
+                { word: '美术', hint: '画画、雕塑等艺术形式', difficulty: 2 },
+                { word: '体育', hint: '锻炼身体的活动', difficulty: 2 },
+                
+                // 高级词汇（7-10关）- 3-5个字符
+                { word: '互联网', hint: '连接全球电脑的网络', difficulty: 3 },
+                { word: '人工智能', hint: '让机器像人一样思考的技术', difficulty: 3 },
+                { word: '环境保护', hint: '保护自然环境的行为', difficulty: 3 },
+                { word: '可持续发展', hint: '满足当前需求又不损害未来的发展', difficulty: 3 },
+                { word: '全球化', hint: '世界各国相互联系的过程', difficulty: 3 },
+                { word: '创新', hint: '创造新的事物或方法', difficulty: 3 },
+                { word: '挑战', hint: '需要努力克服的困难', difficulty: 3 },
+                { word: '机遇', hint: '有利的时机或机会', difficulty: 3 },
+                { word: '未来', hint: '现在之后的时间', difficulty: 3 },
+                { word: '探索', hint: '寻找未知事物的过程', difficulty: 3 },
+                { word: '科学', hint: '研究自然和规律的知识', difficulty: 3 },
+                { word: '技术', hint: '解决问题的方法和工具', difficulty: 3 },
+                { word: '文化', hint: '一个群体的生活方式和信仰', difficulty: 3 },
+                { word: '传统', hint: '代代相传的习俗', difficulty: 3 },
+                { word: '现代', hint: '当前的、最新的', difficulty: 3 }
+            ],
+            
+            // 英语单词库按难度分级
+            englishWords: [
+                // 初级英语词汇（11-13关）
+                { word: 'apple', hint: 'A red or green fruit', difficulty: 1 },
+                { word: 'banana', hint: 'A long yellow fruit', difficulty: 1 },
+                { word: 'orange', hint: 'A round citrus fruit', difficulty: 1 },
+                { word: 'book', hint: 'Something you read', difficulty: 1 },
+                { word: 'pen', hint: 'Used for writing', difficulty: 1 },
+                { word: 'cat', hint: 'A small furry animal', difficulty: 1 },
+                { word: 'dog', hint: 'A loyal pet', difficulty: 1 },
+                { word: 'sun', hint: 'Gives light and heat', difficulty: 1 },
+                { word: 'moon', hint: 'Shines at night', difficulty: 1 },
+                { word: 'tree', hint: 'Has leaves and roots', difficulty: 1 },
+                
+                // 中级英语词汇（14-16关）
+                { word: 'computer', hint: 'Used for work and internet', difficulty: 2 },
+                { word: 'telephone', hint: 'Used to talk to people far away', difficulty: 2 },
+                { word: 'hospital', hint: 'Where you go when sick', difficulty: 2 },
+                { word: 'school', hint: 'Where you learn', difficulty: 2 },
+                { word: 'teacher', hint: 'Helps students learn', difficulty: 2 },
+                { word: 'student', hint: 'Person who learns', difficulty: 2 },
+                { word: 'family', hint: 'Group of related people', difficulty: 2 },
+                { word: 'friend', hint: 'Someone you like to be with', difficulty: 2 },
+                { word: 'music', hint: 'Pleasant sounds', difficulty: 2 },
+                { word: 'sports', hint: 'Physical activities', difficulty: 2 },
+                
+                // 高级英语词汇（17+关）
+                { word: 'internet', hint: 'Global computer network', difficulty: 3 },
+                { word: 'environment', hint: 'Natural world around us', difficulty: 3 },
+                { word: 'technology', hint: 'Use of scientific knowledge', difficulty: 3 },
+                { word: 'education', hint: 'Process of learning', difficulty: 3 },
+                { word: 'innovation', hint: 'Creating something new', difficulty: 3 },
+                { word: 'challenge', hint: 'Something difficult to do', difficulty: 3 },
+                { word: 'opportunity', hint: 'A chance to do something', difficulty: 3 },
+                { word: 'sustainability', hint: 'Ability to continue', difficulty: 3 },
+                { word: 'communication', hint: 'Exchanging information', difficulty: 3 },
+                { word: 'creativity', hint: 'Ability to create new things', difficulty: 3 }
+            ]
+        };
+
+        // DOM 元素引用
+        const elements = {
+            scoreDisplay: document.getElementById('score'),
+            levelDisplay: document.getElementById('level'),
+            levelDetail: document.getElementById('level-detail'),
+            difficultyDisplay: document.getElementById('difficulty'),
+            languageDisplay: document.getElementById('language'),
+            wordDisplay: document.getElementById('word-display'),
+            wordHint: document.getElementById('word-hint'),
+            inputContainer: document.getElementById('input-container'),
+            submitBtn: document.getElementById('submit-btn'),
+            restartBtn: document.getElementById('restart-btn'),
+            hintBtn: document.getElementById('hint-btn'),
+            levelSelectBtn: document.getElementById('level-select-btn'),
+            levelSelectOverlay: document.getElementById('level-select-overlay'),
+            levelSelectPanel: document.getElementById('level-select-panel'),
+            closeLevelSelect: document.getElementById('close-level-select'),
+            closeBtnTop: document.getElementById('close-btn-top'),
+            levelGrid: document.getElementById('level-grid'),
+            message: document.getElementById('message'),
+            wordCard: document.getElementById('word-card')
+        };
+
+        // 初始化游戏
+        function initGame() {
+            gameState.score = 0;
+            gameState.level = 1;
+            gameState.levelProgress = 1;
+            gameState.hintsUsed = 0;
+            gameState.language = 'chinese';
+            gameState.difficulty = 1;
+            gameState.shownEnglishHint = false;
+            updateScoreLevelDifficultyAndLanguage();
+            loadNewWord();
+            setupEventListeners();
+            generateLevelButtons();
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 防止重复添加事件监听器
+            elements.submitBtn.removeEventListener('click', checkAnswer);
+            elements.restartBtn.removeEventListener('click', restartGame);
+            elements.hintBtn.removeEventListener('click', showHint);
+            elements.levelSelectBtn.removeEventListener('click', openLevelSelection);
+            elements.closeLevelSelect.removeEventListener('click', closeLevelSelection);
+            elements.closeBtnTop.removeEventListener('click', closeLevelSelection);
+            document.removeEventListener('keydown', handleKeyPress);
+            
+            elements.submitBtn.addEventListener('click', checkAnswer);
+            elements.restartBtn.addEventListener('click', restartGame);
+            elements.hintBtn.addEventListener('click', showHint);
+            elements.levelSelectBtn.addEventListener('click', openLevelSelection);
+            elements.closeLevelSelect.addEventListener('click', closeLevelSelection);
+            elements.closeBtnTop.addEventListener('click', closeLevelSelection);
+            
+            // 允许使用回车键提交答案
+            document.addEventListener('keydown', handleKeyPress);
+        }
+        
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        }
+
+        // 加载新单词
+        function loadNewWord() {
+            // 第10关后切换到英语
+            if (gameState.level > 10) {
+                gameState.language = 'english';
+            } else {
+                gameState.language = 'chinese';
+            }
+            
+            // 获取当前语言的单词库
+            const wordList = gameState.language === 'chinese' 
+                ? gameState.chineseWords 
+                : gameState.englishWords;
+                
+            // 更新语言显示
+            elements.languageDisplay.textContent = gameState.language === 'chinese' ? '中文' : '英文';
+            
+            // 根据当前关卡选择合适难度的单词
+            if (gameState.language === 'chinese') {
+                gameState.difficulty = Math.min(Math.ceil(gameState.level / 3), 3);
+            } else {
+                // 英语关卡难度计算（11关对应英语难度1）
+                gameState.difficulty = Math.min(Math.ceil((gameState.level - 10) / 3), 3);
+            }
+            
+            const possibleWords = wordList.filter(
+                item => item.difficulty === gameState.difficulty
+            );
+            
+            // 随机选择一个单词
+            const randomIndex = Math.floor(Math.random() * possibleWords.length);
+            gameState.currentWord = possibleWords[randomIndex].word;
+            gameState.currentHint = possibleWords[randomIndex].hint;
+            
+            // 显示单词提示
+            elements.wordHint.textContent = `提示: ${gameState.currentHint}`;
+            
+            // 确定要隐藏的字符数量（1-2个，根据单词长度）
+            const hiddenCount = gameState.currentWord.length > 2 ? 
+                Math.floor(Math.random() * 2) + 1 : 1;
+            
+            // 选择要隐藏的字符索引
+            gameState.hiddenIndices = [];
+            while (gameState.hiddenIndices.length < hiddenCount) {
+                const index = Math.floor(Math.random() * gameState.currentWord.length);
+                if (!gameState.hiddenIndices.includes(index)) {
+                    gameState.hiddenIndices.push(index);
+                }
+            }
+            gameState.hiddenIndices.sort((a, b) => a - b);
+            
+            // 显示单词和输入框
+            displayWord();
+            createInputFields();
+            
+            // 清除消息
+            showMessage('', '');
+            
+            // 当达到第5关且未显示过提示时，显示英语关卡提示
+            if (gameState.level >= 5 && !gameState.shownEnglishHint) {
+                showMessage('提示：第10关后将解锁英语单词消除关卡！', 'text-primary');
+                gameState.shownEnglishHint = true;
+            }
+        }
+
+        // 显示单词（带隐藏字符）
+        function displayWord() {
+            elements.wordDisplay.innerHTML = '';
+            
+            for (let i = 0; i < gameState.currentWord.length; i++) {
+                const charDiv = document.createElement('div');
+                charDiv.className = 'char-display';
+                
+                if (gameState.hiddenIndices.includes(i)) {
+                    charDiv.innerHTML = '<span class="text-neutral">_</span>';
+                } else {
+                    charDiv.textContent = gameState.currentWord[i];
+                }
+                
+                elements.wordDisplay.appendChild(charDiv);
+            }
+        }
+
+        // 创建输入框
+        function createInputFields() {
+            elements.inputContainer.innerHTML = '';
+            
+            gameState.hiddenIndices.forEach((index, i) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.maxLength = 1;
+                input.className = 'input-char';
+                input.dataset.index = index;
+                input.placeholder = '_';
+                
+                // 自动聚焦第一个输入框
+                if (i === 0) {
+                    setTimeout(() => input.focus(), 100);
+                }
+                
+                // 输入后自动跳到下一个输入框
+                input.addEventListener('input', (e) => {
+                    if (e.target.value && i < gameState.hiddenIndices.length - 1) {
+                        const nextInput = elements.inputContainer.children[i + 1];
+                        nextInput.focus();
+                    }
+                });
+                
+                elements.inputContainer.appendChild(input);
+            });
+        }
+
+        // 检查答案
+        function checkAnswer() {
+            const inputs = elements.inputContainer.querySelectorAll('input');
+            let isCorrect = true;
+            
+            // 检查每个输入是否正确（英语不区分大小写）
+            inputs.forEach(input => {
+                const index = parseInt(input.dataset.index);
+                let userChar = input.value.trim();
+                
+                // 英语单词不区分大小写检查
+                if (gameState.language === 'english') {
+                    userChar = userChar.toLowerCase();
+                }
+                
+                if (!userChar || userChar !== gameState.currentWord[index]) {
+                    isCorrect = false;
+                    input.classList.add('border-danger');
+                    // 错误动画
+                    input.classList.add('animate-shake');
+                    setTimeout(() => {
+                        input.classList.remove('animate-shake');
+                    }, 500);
+                } else {
+                    input.classList.add('border-secondary');
+                }
+            });
+            
+            // 处理结果
+            if (isCorrect) {
+                const langText = gameState.language === 'chinese' ? '中文' : '英文';
+                showMessage(`正确！太棒了！(${langText})`, 'text-secondary');
+                gameState.score += 10 * gameState.level;
+                
+                // 更新当前关卡进度
+                gameState.levelProgress++;
+                
+                // 检查是否完成当前关卡
+                if (gameState.levelProgress > gameState.levelTotal) {
+                    gameState.level++;
+                    gameState.levelProgress = 1;
+                    
+                    // 第10关升级到11关时的特殊提示
+                    if (gameState.level === 11) {
+                        showMessage(`恭喜！已解锁英语单词关卡！`, 'text-primary');
+                    } else {
+                        showMessage(`恭喜！升级到第${gameState.level}关！`, 'text-primary');
+                    }
+                }
+                
+                updateScoreLevelDifficultyAndLanguage();
+                
+                // 单词消除动画
+                elements.wordCard.classList.add('scale-90', 'opacity-0', 'rotate-1');
+                
+                // 停留1秒再加载下一题
+                setTimeout(() => {
+                    elements.wordCard.classList.remove('scale-90', 'opacity-0', 'rotate-1', 'rotate--1');
+                    loadNewWord();
+                }, 1000);
+            } else {
+                // 只在答错时显示提示信息
+                showMessage('有点小错误，再试一次！', 'text-danger');
+                // 扣少量分数
+                if (gameState.score > 0) {
+                    gameState.score = Math.max(0, gameState.score - 2);
+                    updateScoreLevelDifficultyAndLanguage();
+                }
+            }
+        }
+
+        // 显示提示
+        function showHint() {
+            if (gameState.score < 5) {
+                showMessage('分数不足，无法使用提示！', 'text-danger');
+                return;
+            }
+            
+            // 消耗分数
+            gameState.score -= 5;
+            updateScoreLevelDifficultyAndLanguage();
+            
+            // 随机选择一个未填的输入框显示提示
+            const inputs = elements.inputContainer.querySelectorAll('input');
+            let emptyInputs = Array.from(inputs).filter(input => !input.value);
+            
+            if (emptyInputs.length === 0) {
+                emptyInputs = Array.from(inputs);
+            }
+            
+            const randomInput = emptyInputs[Math.floor(Math.random() * emptyInputs.length)];
+            const index = parseInt(randomInput.dataset.index);
+            
+            // 提示动画
+            randomInput.classList.add('bg-amber-100');
+            setTimeout(() => {
+                randomInput.value = gameState.currentWord[index];
+                randomInput.classList.remove('bg-amber-100');
+                showMessage('提示：已填充一个字符！', 'text-amber-500');
+            }, 500);
+            
+            gameState.hintsUsed++;
+        }
+
+        // 显示消息
+        function showMessage(text, className) {
+            elements.message.textContent = text;
+            elements.message.className = `text-center text-lg font-medium mb-4 transition-all duration-300 ${className}`;
+            elements.message.style.opacity = '1';
+            elements.message.style.transform = 'translateY(0)';
+            
+            // 3秒后隐藏消息
+            setTimeout(() => {
+                elements.message.style.opacity = '0';
+                elements.message.style.transform = 'translateY(2px)';
+            }, 3000);
+        }
+
+        // 更新分数、等级、难度和语言显示
+        function updateScoreLevelDifficultyAndLanguage() {
+            elements.scoreDisplay.textContent = gameState.score;
+            elements.levelDisplay.textContent = gameState.level;
+            elements.levelDetail.textContent = `${gameState.level}-${gameState.levelProgress}`; // 显示关卡细分
+            elements.languageDisplay.textContent = gameState.language === 'chinese' ? '中文' : '英文';
+            
+            // 根据难度值显示对应的文本
+            const difficultyText = gameState.difficulty === 1 ? '简单' : 
+                                 gameState.difficulty === 2 ? '中等' : '困难';
+            elements.difficultyDisplay.textContent = difficultyText;
+            
+            // 添加分数变化动画
+            elements.scoreDisplay.classList.add('scale-125', 'text-secondary');
+            setTimeout(() => {
+                elements.scoreDisplay.classList.remove('scale-125', 'text-secondary');
+            }, 300);
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            // 添加重置动画
+            elements.wordCard.classList.add('scale-90', 'opacity-0', 'rotate--1');
+            
+            setTimeout(() => {
+                initGame();
+                elements.wordCard.classList.remove('scale-90', 'opacity-0', 'rotate-1', 'rotate--1');
+                showMessage('游戏重新开始！', 'text-primary');
+            }, 300);
+        }
+
+        // 生成选关按钮
+        function generateLevelButtons() {
+            elements.levelGrid.innerHTML = '';
+            
+            // 生成20个关卡按钮
+            for (let i = 1; i <= 20; i++) {
+                const levelBtn = document.createElement('div');
+                levelBtn.className = 'level-btn';
+                levelBtn.textContent = i;
+                levelBtn.dataset.level = i;
+                
+                // 当前关卡高亮显示
+                if (i === gameState.level) {
+                    levelBtn.classList.add('bg-secondary');
+                }
+                
+                // 英语关卡标记
+                if (i > 10) {
+                    const badge = document.createElement('span');
+                    badge.className = 'absolute text-xs bg-white text-purple-500 rounded-full w-4 h-4 flex items-center justify-center -top-1 -right-1';
+                    badge.textContent = 'E';
+                    levelBtn.style.position = 'relative';
+                    levelBtn.appendChild(badge);
+                }
+                
+                levelBtn.addEventListener('click', () => selectLevel(i));
+                elements.levelGrid.appendChild(levelBtn);
+            }
+        }
+
+        // 打开选关界面
+        function openLevelSelection() {
+            // 更新关卡按钮状态
+            generateLevelButtons();
+            
+            // 应用曲线动画（从左侧滑入）
+            elements.levelSelectOverlay.style.transform = 'translateX(0)';
+            elements.levelSelectOverlay.style.animation = 'slideInLeft 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+            
+            // 稍微延迟面板动画，营造层次感
+            setTimeout(() => {
+                elements.levelSelectPanel.style.transform = 'translateX(0)';
+                elements.levelSelectPanel.style.animation = 'slideInLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.1s';
+            }, 100);
+        }
+
+        // 关闭选关界面
+        function closeLevelSelection() {
+            // 应用曲线动画（滑出到左侧）
+            elements.levelSelectPanel.style.transform = 'translateX(-100%)';
+            elements.levelSelectPanel.style.animation = 'slideOutLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+            
+            setTimeout(() => {
+                elements.levelSelectOverlay.style.transform = 'translateX(-100%)';
+                elements.levelSelectOverlay.style.animation = 'slideOutLeft 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.1s';
+            }, 100);
+        }
+
+        // 选择关卡
+        function selectLevel(level) {
+            gameState.level = level;
+            gameState.levelProgress = 1;
+            
+            // 重置分数
+            gameState.score = 0;
+            
+            // 更新显示
+            updateScoreLevelDifficultyAndLanguage();
+            
+            // 关闭选关界面
+            closeLevelSelection();
+            
+            // 加载新单词
+            setTimeout(() => {
+                loadNewWord();
+                showMessage(`已切换到第${level}关`, 'text-primary');
+            }, 800); // 等待动画完成
+        }
+
+        // 添加自定义动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                50% { transform: translateX(5px); }
+                75% { transform: translateX(-5px); }
+            }
+            
+            @keyframes slideInLeft {
+                0% { 
+                    transform: translateX(-100%) rotate(0deg);
+                    opacity: 0;
+                }
+                50% {
+                    transform: translateX(20%) rotate(2deg);
+                    opacity: 0.8;
+                }
+                100% { 
+                    transform: translateX(0) rotate(0deg);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutLeft {
+                0% { 
+                    transform: translateX(0) rotate(0deg);
+                    opacity: 1;
+                }
+                50% {
+                    transform: translateX(-20%) rotate(-2deg);
+                    opacity: 0.8;
+                }
+                100% { 
+                    transform: translateX(-100%) rotate(0deg);
+                    opacity: 0;
+                }
+            }
+            
+            .animate-shake {
+                animation: shake 0.5s ease-in-out;
+            }
+            
+            .rotate-1 {
+                transform: rotate(1deg);
+            }
+            
+            .rotate--1 {
+                transform: rotate(-1deg);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 启动游戏
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
+    
