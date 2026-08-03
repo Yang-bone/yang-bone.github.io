@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>贪吃蛇游戏</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+        canvas {
+            border: 2px solid #444;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+		#returnLink {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 20;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.55rem 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #111;
+            text-decoration: none;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+            font-family: 'Adofai 2', sans-serif;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        #returnLink:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 1);
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #444;
+            transform: scale(1.05);
+        }
+        .score {
+            font-size: 24px;
+            margin-top: 10px;
+            text-shadow: 0 0 10px cyan;
+        }
+        h1 {
+            text-shadow: 0 0 10px cyan;
+            margin-bottom: 5px;
+        }
+        p {
+            margin-top: 10px;
+            color: #aaa;
+        }
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div id="background"></div>
+	<a id="returnLink" href="https://yang-bone.github.io/projects">返回</a>
+    <h1>贪吃蛇游戏</h1>
+    <div class="score">分数: <span id="score">0</span></div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+        <button id="startBtn">开始你的游戏</button>
+        <button id="pauseBtn">暂停你的游戏</button>
+    </div>
+    <p>使用方向键或WASD控制蛇的移动</p>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const background = document.getElementById('background');
+        
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+        
+        let snake = [];
+        let food = {};
+        let staticObstacles = [];
+        let movingObstacles = [];
+        let chasingObstacles = [];
+        let rotatingObstacles = [];
+        let trailObstacles = [];
+        let trails = [];
+        let score = 0;
+        let velocityX = 0;
+        let velocityY = 0;
+        let gameSpeed = 7;
+        let gameLoop;
+        let isPaused = false;
+        let isGameRunning = false;
+        let backgroundParticles = [];
+        let lastTime = 0;
+        
+        // 创建背景粒子效果
+        function createBackground() {
+            background.innerHTML = '';
+            backgroundParticles = [];
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = Math.random() * 5 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.backgroundColor = `hsl(${Math.random() * 60 + 180}, 100%, 50%)`;
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                const speed = Math.random() * 0.5 + 0.1;
+                const angle = Math.random() * Math.PI * 2;
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+                
+                background.appendChild(particle);
+                backgroundParticles.push({
+                    element: particle,
+                    x: parseFloat(particle.style.left) / 100 * window.innerWidth,
+                    y: parseFloat(particle.style.top) / 100 * window.innerHeight,
+                    vx,
+                    vy
+                });
+            }
+            
+            // 动画循环
+            function animateBackground() {
+                for (let particle of backgroundParticles) {
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    
+                    // 边界检查
+                    if (particle.x < 0 || particle.x > window.innerWidth) {
+                        particle.vx *= -1;
+                    }
+                    if (particle.y < 0 || particle.y > window.innerHeight) {
+                        particle.vy *= -1;
+                    }
+                    
+                    particle.element.style.left = (particle.x / window.innerWidth * 100) + '%';
+                    particle.element.style.top = (particle.y / window.innerHeight * 100) + '%';
+                }
+                
+                requestAnimationFrame(animateBackground);
+            }
+            
+            animateBackground();
+        }
+        
+        // 初始化游戏
+        function initGame() {
+            snake = [
+                {x: 10, y: 10},
+                {x: 9, y: 10},
+                {x: 8, y: 10}
+            ];
+            
+            staticObstacles = [];
+            movingObstacles = [];
+            chasingObstacles = [];
+            rotatingObstacles = [];
+            trailObstacles = [];
+            trails = [];
+            
+            velocityX = 1;
+            velocityY = 0;
+            score = 0;
+            scoreElement.textContent = score;
+            gameSpeed = 7;
+            lastTime = 0;
+            
+            placeFood();
+            createBackground();
+        }
+        
+        // 随机放置食物
+        function placeFood() {
+            const occupiedPositions = [...snake, ...staticObstacles, ...movingObstacles, 
+                                     ...chasingObstacles, ...rotatingObstacles, ...trailObstacles,
+                                     ...trails.map(t => t.position)];
+            
+            do {
+                food = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while (occupiedPositions.some(pos => pos.x === food.x && pos.y === food.y));
+        }
+        
+        // 生成障碍物
+        function generateObstacles() {
+            // 静态障碍物 (红色) - 分数超过5显示
+            if (score >= 5 && staticObstacles.length < Math.floor(score / 5)) {
+                const newObstacle = getRandomEmptyPosition();
+                if (newObstacle) staticObstacles.push(newObstacle);
+            }
+            
+            // 移动障碍物 (蓝色) - 分数超过15显示
+            if (score >= 15 && movingObstacles.length < Math.floor((score - 15) / 10)) {
+                const newObstacle = {
+                    ...getRandomEmptyPosition(),
+                    vx: Math.random() > 0.5 ? 1 : -1,
+                    vy: 0
+                };
+                if (newObstacle.x) movingObstacles.push(newObstacle);
+            }
+            
+            // 追踪障碍物 (黄色) - 分数超过25显示
+            if (score >= 25 && chasingObstacles.length < Math.floor((score - 25) / 15)) {
+                const newObstacle = {
+                    ...getRandomEmptyPosition(),
+                    speed: 0.5
+                };
+                if (newObstacle.x) chasingObstacles.push(newObstacle);
+            }
+            
+            // 旋转障碍物 (紫色) - 分数超过40显示
+            if (score >= 40 && rotatingObstacles.length < Math.floor((score - 40) / 20)) {
+                const newObstacle = {
+                    ...getRandomEmptyPosition(),
+                    angle: 0,
+                    speed: Math.random() * 0.05 + 0.02,
+                    radius: Math.random() * 3 + 2,
+                    centerX: Math.floor(Math.random() * (tileCount - 8)) + 4,
+                    centerY: Math.floor(Math.random() * (tileCount - 8)) + 4
+                };
+                if (newObstacle.x) rotatingObstacles.push(newObstacle);
+            }
+            
+            // 痕迹障碍物 (青色) - 分数超过50显示
+            if (score >= 50 && trailObstacles.length < Math.floor((score - 50) / 25)) {
+                const newObstacle = {
+                    ...getRandomEmptyPosition(),
+                    vx: Math.random() > 0.5 ? 1 : -1,
+                    vy: 0,
+                    lastTrailTime: 0,
+                    trailInterval: 2000 // 每2秒留下一个痕迹
+                };
+                if (newObstacle.x) trailObstacles.push(newObstacle);
+            }
+        }
+        
+        // 获取随机空位置
+        function getRandomEmptyPosition() {
+            const occupiedPositions = [...snake, food, ...staticObstacles, ...movingObstacles, 
+                                     ...chasingObstacles, ...rotatingObstacles, ...trailObstacles,
+                                     ...trails.map(t => t.position)];
+            let attempts = 0;
+            let position;
+            
+            do {
+                position = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+                attempts++;
+            } while (occupiedPositions.some(pos => pos.x === position.x && pos.y === position.y) && attempts < 100);
+            
+            return attempts < 100 ? position : null;
+        }
+        
+        // 绘制游戏
+        function drawGame() {
+            // 渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#001a33');
+            gradient.addColorStop(1, '#000033');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制网格线（更酷炫的样式）
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < tileCount; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * gridSize, 0);
+                ctx.lineTo(i * gridSize, canvas.height);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(0, i * gridSize);
+                ctx.lineTo(canvas.width, i * gridSize);
+                ctx.stroke();
+            }
+            
+            // 绘制静态障碍物 (红色)
+            ctx.fillStyle = 'rgba(255, 50, 50, 0.7)';
+            for (let obstacle of staticObstacles) {
+                ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize-1, gridSize-1);
+            }
+            
+            // 绘制移动障碍物 (蓝色)
+            ctx.fillStyle = 'rgba(50, 50, 255, 0.7)';
+            for (let obstacle of movingObstacles) {
+                ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize-1, gridSize-1);
+            }
+            
+            // 绘制追踪障碍物 (黄色)
+            ctx.fillStyle = 'rgba(255, 255, 50, 0.7)';
+            for (let obstacle of chasingObstacles) {
+                ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize-1, gridSize-1);
+            }
+            
+            // 绘制旋转障碍物 (紫色)
+            ctx.fillStyle = 'rgba(150, 50, 255, 0.7)';
+            for (let obstacle of rotatingObstacles) {
+                obstacle.angle += obstacle.speed;
+                obstacle.x = obstacle.centerX + Math.cos(obstacle.angle) * obstacle.radius;
+                obstacle.y = obstacle.centerY + Math.sin(obstacle.angle) * obstacle.radius;
+                ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize-1, gridSize-1);
+            }
+            
+            // 绘制痕迹障碍物和痕迹 (青色)
+            const currentTime = Date.now();
+            ctx.fillStyle = 'rgba(50, 255, 255, 0.5)';
+            for (let obstacle of trailObstacles) {
+                // 更新障碍物位置
+                obstacle.x += obstacle.vx;
+                obstacle.y += obstacle.vy;
+                
+                // 边界检查并反弹
+                if (obstacle.x <= 0 || obstacle.x >= tileCount - 1) {
+                    obstacle.vx *= -1;
+                    obstacle.x = Math.max(0, Math.min(tileCount - 1, obstacle.x));
+                }
+                if (obstacle.y <= 0 || obstacle.y >= tileCount - 1) {
+                    obstacle.vy *= -1;
+                    obstacle.y = Math.max(0, Math.min(tileCount - 1, obstacle.y));
+                }
+                
+                // 绘制障碍物
+                ctx.fillStyle = 'rgba(50, 255, 255, 0.7)';
+                ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize-1, gridSize-1);
+                
+                // 检查是否需要留下新痕迹
+                if (currentTime - obstacle.lastTrailTime > obstacle.trailInterval) {
+                    trails.push({
+                        position: {x: Math.round(obstacle.x), y: Math.round(obstacle.y)},
+                        time: currentTime
+                    });
+                    obstacle.lastTrailTime = currentTime;
+                }
+            }
+            
+            // 绘制并清理过期痕迹
+            ctx.fillStyle = 'rgba(50, 255, 255, 0.3)';
+            for (let i = trails.length - 1; i >= 0; i--) {
+                const trail = trails[i];
+                if (currentTime - trail.time > 2000) { // 2秒后消失
+                    trails.splice(i, 1);
+                } else {
+                    const alpha = 0.3 * (1 - (currentTime - trail.time) / 2000);
+                    ctx.fillStyle = `rgba(50, 255, 255, ${alpha})`;
+                    ctx.fillRect(trail.position.x * gridSize, trail.position.y * gridSize, gridSize-1, gridSize-1);
+                }
+            }
+            
+            // 绘制食物 (发光效果)
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize-1, gridSize-1);
+            ctx.shadowColor = 'red';
+            ctx.shadowBlur = 10;
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize-1, gridSize-1);
+            ctx.shadowBlur = 0;
+            
+            // 绘制蛇身 (发光效果)
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.7)';
+            for (let i = 1; i < snake.length; i++) {
+                ctx.fillRect(snake[i].x * gridSize, snake[i].y * gridSize, gridSize-1, gridSize-1);
+            }
+            ctx.shadowColor = 'lime';
+            ctx.shadowBlur = 5;
+            for (let i = 1; i < snake.length; i++) {
+                ctx.fillRect(snake[i].x * gridSize, snake[i].y * gridSize, gridSize-1, gridSize-1);
+            }
+            ctx.shadowBlur = 0;
+            
+            // 绘制蛇头
+            let head = snake[0];
+            ctx.fillStyle = 'rgba(0, 200, 0, 0.9)';
+            ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize-1, gridSize-1);
+            ctx.shadowColor = 'cyan';
+            ctx.shadowBlur = 10;
+            ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize-1, gridSize-1);
+            ctx.shadowBlur = 0;
+            
+            // 在蛇头上显示长度数字
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(snake.length.toString(), head.x * gridSize + gridSize/2, head.y * gridSize + gridSize/2);
+        }
+        
+        // 更新游戏状态
+        function updateGame() {
+            if (isPaused) return;
+            
+            generateObstacles();
+            
+            // 更新移动障碍物位置
+            for (let obstacle of movingObstacles) {
+                obstacle.x += obstacle.vx;
+                obstacle.y += obstacle.vy;
+                
+                // 边界检查并反弹
+                if (obstacle.x <= 0 || obstacle.x >= tileCount - 1) {
+                    obstacle.vx *= -1;
+                    obstacle.x = Math.max(0, Math.min(tileCount - 1, obstacle.x));
+                }
+                if (obstacle.y <= 0 || obstacle.y >= tileCount - 1) {
+                    obstacle.vy *= -1;
+                    obstacle.y = Math.max(0, Math.min(tileCount - 1, obstacle.y));
+                }
+            }
+            
+            // 更新追踪障碍物位置
+            if (snake.length > 0) {
+                const head = snake[0];
+                for (let obstacle of chasingObstacles) {
+                    const dx = head.x - obstacle.x;
+                    const dy = head.y - obstacle.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > 0) {
+                        obstacle.x += (dx / distance) * obstacle.speed;
+                        obstacle.y += (dy / distance) * obstacle.speed;
+                    }
+                    
+                    // 确保不会超出边界
+                    obstacle.x = Math.max(0, Math.min(tileCount - 1, obstacle.x));
+                    obstacle.y = Math.max(0, Math.min(tileCount - 1, obstacle.y));
+                }
+            }
+            
+            let head = {x: snake[0].x + velocityX, y: snake[0].y + velocityY};
+            
+            // 检查是否撞墙
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                gameOver();
+                return;
+            }
+            
+            // 检查是否撞到自己
+            for (let segment of snake) {
+                if (segment.x === head.x && segment.y === head.y) {
+                    gameOver();
+                    return;
+                }
+            }
+            
+            // 检查是否撞到障碍物
+            const allObstacles = [...staticObstacles, ...movingObstacles, ...chasingObstacles, ...rotatingObstacles, ...trailObstacles];
+            for (let obstacle of allObstacles) {
+                if (Math.abs(obstacle.x - head.x) < 1 && Math.abs(obstacle.y - head.y) < 1) {
+                    gameOver();
+                    return;
+                }
+            }
+            
+            // 检查是否撞到痕迹
+            for (let trail of trails) {
+                if (Math.abs(trail.position.x - head.x) < 1 && Math.abs(trail.position.y - head.y) < 1) {
+                    gameOver();
+                    return;
+                }
+            }
+            
+            // 移动蛇
+            snake.unshift(head);
+            
+            // 检查是否吃到食物
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                scoreElement.textContent = score;
+                
+                // 每得5分加快游戏速度
+                if (score % 5 === 0) {
+                    gameSpeed += 0.5;
+                }
+                
+                placeFood();
+            } else {
+                snake.pop();
+            }
+        }
+        
+        // 游戏结束
+        function gameOver() {
+            clearInterval(gameLoop);
+            isGameRunning = false;
+            alert(`游戏结束！你的游戏得分是↘: ${score}\n蛇的长度是↘: ${snake.length}`);
+        }
+        
+        // 开始游戏
+        function startGame() {
+            if (isGameRunning) return;
+            
+            initGame();
+            isGameRunning = true;
+            isPaused = false;
+            pauseBtn.textContent = "暂停你的游戏";
+            
+            gameLoop = setInterval(() => {
+                updateGame();
+                drawGame();
+            }, 1000 / gameSpeed);
+        }
+        
+        // 暂停/继续游戏
+        function togglePause() {
+            if (!isGameRunning) return;
+            
+            isPaused = !isPaused;
+            pauseBtn.textContent = isPaused ? "继续你的游戏" : "暂停你的游戏";
+        }
+        
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            // 防止按键导致页面滚动
+            if ([37, 38, 39, 40, 65, 87, 68, 83].includes(e.keyCode)) {
+                e.preventDefault();
+            }
+            
+            // 方向键或WASD控制
+            switch(e.keyCode) {
+                case 37: // 左箭头
+                case 65: // A
+                    if (velocityX !== 1) {
+                        velocityX = -1;
+                        velocityY = 0;
+                    }
+                    break;
+                case 38: // 上箭头
+                case 87: // W
+                    if (velocityY !== 1) {
+                        velocityX = 0;
+                        velocityY = -1;
+                    }
+                    break;
+                case 39: // 右箭头
+                case 68: // D
+                    if (velocityX !== -1) {
+                        velocityX = 1;
+                        velocityY = 0;
+                    }
+                    break;
+                case 40: // 下箭头
+                case 83: // S
+                    if (velocityY !== -1) {
+                        velocityX = 0;
+                        velocityY = 1;
+                    }
+                    break;
+                case 32: // 空格键暂停/继续
+                    togglePause();
+                    break;
+            }
+        });
+        
+        // 按钮事件
+        startBtn.addEventListener('click', startGame);
+        pauseBtn.addEventListener('click', togglePause);
+        
+        // 初始绘制
+        createBackground();
+        drawGame();
+    </script>
+</body>
+</html>
