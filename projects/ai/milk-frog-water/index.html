@@ -1,1 +1,1912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>奶蛙喝水 - 手搓版</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+    #game {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    canvas { 
+      display: block; 
+      cursor: crosshair; 
+      image-rendering: auto;
+      margin: auto;
+    }
+    .game-container {
+      position: relative;
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ui-layer {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      display: none !important;
+    }
+    .ui-layer.active { display: block !important; pointer-events: none; }
+    #menu-ui.active { display: flex !important; }
+    .btn {
+      pointer-events: auto;
+      display: inline-block;
+      padding: 10px 22px;
+      background: linear-gradient(180deg, #d4863c 0%, #a0521e 100%);
+      color: #fff;
+      border: 3px solid #5d3311;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      text-shadow: 1px 1px 0 #5d3311;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.25), 0 4px 0 #3e220b;
+      transition: transform 0.05s;
+      text-align: center;
+    }
+    .btn:active { transform: translateY(3px); box-shadow: inset 0 2px 0 rgba(255,255,255,0.25), 0 1px 0 #3e220b; }
+    .btn.small { font-size: 14px; padding: 6px 14px; border-radius: 8px; }
+    .panel {
+      pointer-events: auto;
+      background: linear-gradient(180deg, #8b5a2b 0%, #5d3311 100%);
+      border: 4px solid #3e220b;
+      border-radius: 14px;
+      color: #fff;
+      padding: 14px;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.15), 0 6px 0 #2a1606;
+    }
+    .panel h3 { text-align: center; margin-bottom: 10px; font-size: 18px; color: #ffe0a8; }
+    .panel .row { margin: 6px 0; font-size: 13px; }
+    .panel input, .panel select {
+      width: 100%;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #3e220b;
+      background: #fff8e8;
+      color: #333;
+      font-size: 13px;
+    }
 
+    /* 主菜单 */
+    #menu-ui { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    #menu-ui .title {
+      width: 420px; height: 110px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="420" height="110"><rect x="10" y="10" width="400" height="90" rx="16" fill="%23b56c2e" stroke="%233e220b" stroke-width="6"/><text x="210" y="68" font-size="42" fill="%23fff" text-anchor="middle" font-weight="bold" font-family="Microsoft YaHei">奶蛙喝水</text></svg>') no-repeat center;
+      background-size: contain;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 42px; font-weight: bold;
+      text-shadow: 2px 2px 0 #3e220b;
+      margin-bottom: 40px;
+    }
+    #menu-ui .btn { margin: 12px 0; width: 240px; }
+
+    /* 编辑器UI */
+    #editor-ui { display: none; }
+    #editor-ui.active { display: block; }
+    #editor-toolbar {
+      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px;
+      pointer-events: auto;
+    }
+    #editor-left {
+      position: absolute; top: 70px; left: 10px; width: 130px; bottom: 10px;
+      overflow-y: auto;
+      pointer-events: auto;
+    }
+    #editor-left .item {
+      pointer-events: auto;
+      margin: 6px 0; padding: 8px;
+      background: linear-gradient(180deg, #4a90d9 0%, #2a5a9c 100%);
+      border: 2px solid #1a3a6c;
+      border-radius: 8px;
+      color: #fff; text-align: center; font-size: 14px; font-weight: bold;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 3px 0 #102a50;
+    }
+    #editor-left input, #editor-right input, #editor-right select, #editor-toolbar input { pointer-events: auto; }
+    #editor-left .item.selected {
+      background: linear-gradient(180deg, #f0c040 0%, #c08020 100%);
+      border-color: #704010;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 3px 0 #50300a;
+    }
+    #editor-right {
+      position: absolute; top: 240px; right: 10px; width: 180px;
+      pointer-events: auto;
+      cursor: grab;
+    }
+    #editor-right:active { cursor: grabbing; }
+    #editor-hint {
+      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      color: #fff; font-size: 13px; text-shadow: 1px 1px 2px #000;
+      pointer-events: none;
+    }
+
+    /* 游戏HUD */
+    #play-ui { display: none; }
+    #play-ui.active { display: block; }
+    #play-top {
+      position: absolute; top: 10px; left: 10px; right: 10px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      pointer-events: auto;
+    }
+    #level-name {
+      position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+      color: #fff; font-size: 26px; font-weight: bold;
+      text-shadow: 2px 2px 0 #3e220b;
+      pointer-events: none;
+    }
+    #play-bottom {
+      position: absolute; bottom: 10px; left: 10px;
+      z-index: 10;
+      cursor: grab;
+      pointer-events: auto;
+    }
+    #play-bottom:active { cursor: grabbing; }
+    .draggable-btn { cursor: grab; }
+    .draggable-btn:active { cursor: grabbing; }
+    .wood-tip {
+      position: absolute;
+      left: 10px; top: 60px;
+      width: 170px;
+      background: linear-gradient(180deg, #8b5a2b 0%, #5d3311 100%);
+      border: 3px solid #3e220b;
+      border-radius: 10px;
+      color: #ffe0a8;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.6;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.15), 0 5px 0 #2a1606;
+      cursor: grab;
+      user-select: none;
+      z-index: 10;
+      pointer-events: auto;
+    }
+    .wood-tip:active { cursor: grabbing; }
+    .wood-tip .drag-handle {
+      cursor: grab;
+      padding: 2px 4px;
+      margin: -10px -10px 8px -10px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 7px 7px 0 0;
+      text-align: center;
+      font-size: 10px;
+      color: #aaa;
+    }
+    .wood-tip .drag-handle:active { cursor: grabbing; }
+    #editor-right .drag-handle {
+      cursor: grab;
+      padding: 3px 6px;
+      margin: -14px 0 6px 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.15));
+      text-align: center;
+      font-size: 10px;
+      color: #ddd;
+      border-radius: 6px;
+    }
+    #editor-right .drag-handle:active { cursor: grabbing; }
+    .wood-tip strong { color: #fff; font-size: 14px; display: block; margin-bottom: 6px; }
+    .wood-tip li { margin-left: 16px; margin-bottom: 4px; }
+
+    /* 弹窗 */
+    #modal {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.55);
+      display: none; align-items: center; justify-content: center;
+      pointer-events: auto;
+    }
+    #modal.active { display: flex; }
+    #modal .panel { min-width: 300px; text-align: center; }
+    #modal .panel p { margin: 14px 0; font-size: 18px; }
+    #level-list { max-height: 520px; overflow-y: auto; padding: 10px; }
+    #level-list::-webkit-scrollbar { width: 8px; }
+    #level-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+    #level-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+    .level-card {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.1); border-radius: 8px;
+      padding: 8px; margin: 8px 0; cursor: pointer;
+      text-align: left;
+      pointer-events: auto;
+    }
+    .level-card:hover { background: rgba(255,255,255,0.2); }
+    .level-card .thumb { width: 80px; height: 50px; background: #3a7bc0; border-radius: 4px; flex-shrink: 0; }
+    .level-card .info { flex: 1; }
+    .level-card .title { font-weight: bold; font-size: 15px; }
+    .level-card .meta { font-size: 12px; color: #d0d0d0; }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="game-container">
+      <canvas id="canvas" width="960" height="640"></canvas>
+
+      <!-- 主菜单 -->
+      <div id="menu-ui" class="ui-layer active">
+        <div class="title">奶蛙喝水</div>
+        <button class="btn" data-action="official">官方关卡</button>
+        <button class="btn" data-action="custom">玩家自制</button>
+        <button class="btn" data-action="editor">关卡编辑器</button>
+        <button class="btn small" data-action="switch-bg" style="margin-top:20px;">切换背景 (1/8)</button>
+      </div>
+
+      <!-- 关卡选择 -->
+      <div id="select-ui" class="ui-layer">
+      <div id="select-title" style="position:absolute;top:20px;left:50%;transform:translateX(-50%);color:#fff;font-size:26px;font-weight:bold;text-shadow:2px 2px 0 #3e220b;pointer-events:none;">选择关卡</div>
+      <div style="position:absolute;top:10px;left:10px;">
+        <button class="btn small" data-action="back">返回</button>
+      </div>
+      <div id="level-list" style="position:absolute;top:80px;left:50%;transform:translateX(-50%);width:720px;"></div>
+    </div>
+
+    <!-- 游戏 -->
+    <div id="play-ui" class="ui-layer">
+      <div id="level-name"></div>
+      <div id="play-top">
+        <button class="btn small" data-action="back">返回</button>
+        <button class="btn small" data-action="restart">重玩</button>
+      </div>
+      <div class="wood-tip" id="play-tip">
+        <div class="drag-handle">⋮⋮ 拖动</div>
+        <strong>基础操作</strong>
+        <ol>
+          <li>拖动鼠标画出水路</li>
+          <li>点击上方葫芦出水</li>
+          <li>让奶蛙喝到水过关</li>
+        </ol>
+      </div>
+      <div id="play-bottom">
+        <button class="btn small draggable-btn" data-action="clear-lines">清除画线 ⋮⋮</button>
+      </div>
+    </div>
+
+    <!-- 编辑器 -->
+    <div id="editor-ui" class="ui-layer">
+      <div id="editor-toolbar">
+        <input id="level-name-input" type="text" value="未命名关卡" placeholder="关卡名称" style="padding:6px 10px;border-radius:6px;border:2px solid #3e220b;background:#fff8e8;color:#333;font-size:14px;width:140px;">
+        <button class="btn small" data-action="test-level">测试</button>
+        <button class="btn small" data-action="publish-level">发布</button>
+        <button class="btn small" data-action="load-level">加载</button>
+        <button class="btn small" data-action="export-level">导出</button>
+        <button class="btn small" data-action="clear-level">清空</button>
+        <button class="btn small" data-action="level-bg">背景: 1</button>
+        <button class="btn small" data-action="back">返回</button>
+      </div>
+      <div id="editor-left" class="panel">
+        <h3>对象</h3>
+        <div class="item selected" data-type="null">空选</div>
+        <div class="item" data-type="gourd">葫芦</div>
+        <div class="item" data-type="frog">奶蛙</div>
+        <div class="item" data-type="purifier">净化器</div>
+        <div class="item" data-type="rectWall">矩形障碍</div>
+        <div class="item" data-type="rotateWall">旋转障碍</div>
+        <div class="item" data-type="teleportHat">传送帽</div>
+        <div class="item" data-type="accelerator">加速器</div>
+        <div class="item" data-type="fan">风扇</div>
+        <div class="item" data-type="ball">球</div>
+        <div class="item" data-type="block">方块</div>
+        <div class="item" data-type="fireBlock">火块</div>
+        <div class="item" data-type="iceBlock">冰块</div>
+      </div>
+      <div id="editor-right" class="panel">
+        <div class="drag-handle">⋮⋮ 拖动</div>
+        <h3>属性</h3>
+        <div id="prop-panel">未选择对象</div>
+      </div>
+      <div class="wood-tip" style="right:10px;left:auto;width:180px;">
+        <strong>编辑关卡操作</strong>
+        <ol>
+          <li>点左侧物品，在场景中单击放置</li>
+          <li>左键拖拽移动物品</li>
+          <li>右侧设置属性</li>
+          <li>选中按 Delete 删除</li>
+          <li>Ctrl+D 复制物体</li>
+          <li>测试/发布/导出保存关卡</li>
+        </ol>
+      </div>
+      <div id="editor-hint">当前模式：<span id="editor-mode">选择</span></div>
+      </div>
+
+      <!-- 弹窗 -->
+      <div id="modal">
+        <div class="panel">
+          <h3 id="modal-title">提示</h3>
+          <div id="modal-body"></div>
+          <div style="margin-top:14px">
+            <button class="btn small" data-action="modal-ok">确定</button>
+            <button class="btn small" data-action="modal-cancel">取消</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const WIDTH = 960, HEIGHT = 640;
+
+    // 加载图片
+    const imgs = {};
+    function loadImg(name, src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { imgs[name] = img; resolve(); };
+        img.onerror = () => { resolve(); };
+        img.src = src;
+      });
+    }
+    Promise.all([
+      loadImg('frog', 'frog.png'),
+      loadImg('gourd', 'gourd.png'),
+      loadImg('bg1', '1.png'),
+      loadImg('bg2', '2.png'),
+      loadImg('bg3', '3.png'),
+      loadImg('bg4', '4.png'),
+      loadImg('bg5', '5.png'),
+      loadImg('bg6', '6.png'),
+      loadImg('bg7', '7.png'),
+      loadImg('bg8', '8.png')
+    ]).then(start);
+
+    // ===== 状态 =====
+    let screen = 'menu';
+    let returnToEditor = false;
+    let currentLevelSource = 'official'; // 'official', 'custom', 'editor'
+    let mouse = { x:0, y:0, down:false, justDown:false, justUp:false };
+    let keys = {};
+    let lastTime = 0;
+    let currentBg = 0;
+    const backgrounds = ['bg1', 'bg2', 'bg3', 'bg4', 'bg5', 'bg6', 'bg7', 'bg8'];
+    let canvasScale = 1;
+    let canvasOffset = { x: 0, y: 0 };
+
+    // 游戏关卡数据
+    let level = null; // { name, gourd, frog, obstacles, lines }
+    let particles = [];
+    let winTimer = 0;
+    let won = false;
+
+    // 编辑器状态
+    let editor = {
+      selectedTool: null,
+      selectedObj: null,
+      dragging: false,
+      dragOffset: {x:0,y:0},
+      modeText: '选择',
+      pairingFrom: null // 传送门配对起点
+    };
+
+    // 官方关卡
+    const officialLevels = [
+      {
+        name: '挤一挤对吗',
+        gourd: { x: 480, y: 100, total: 100, current: 100, r: 28 },
+        frogs: [{ x: 480, y: 560, need: 60, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'rectWall', x:360, y:300, w:20, h:180, angle:-15 },
+          { type:'rectWall', x:600, y:300, w:20, h:180, angle:15 },
+          { type:'rectWall', x:480, y:410, w:160, h:20, angle:0 }
+        ],
+        lines: [],
+        bg: 0
+      },
+      {
+        name: '拐弯抹角',
+        gourd: { x: 120, y: 100, total: 80, current: 80, r: 28 },
+        frogs: [{ x: 840, y: 560, need: 50, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'rectWall', x:480, y:200, w:20, h:260, angle:0 },
+          { type:'ball', x:300, y:450, r:35 },
+          { type:'ball', x:660, y:450, r:35 }
+        ],
+        lines: [],
+        bg: 2
+      },
+      {
+        name: '旋转跳跃',
+        gourd: { x: 480, y: 90, total: 90, current: 90, r: 28 },
+        frogs: [{ x: 480, y: 560, need: 55, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'rotateWall', x:400, y:280, w:140, h:18, angle:0, speed:1.2 },
+          { type:'rotateWall', x:560, y:420, w:140, h:18, angle:90, speed:-1.5 },
+          { type:'block', x:200, y:520, w:120, h:24, angle:10 }
+        ],
+        lines: [],
+        bg: 4
+      },
+      {
+        name: '双蛙争水',
+        gourd: { x: 480, y: 80, total: 120, current: 120, r: 28 },
+        frogs: [
+          { x: 160, y: 560, need: 40, drink: 0, r: 36 },
+          { x: 800, y: 560, need: 40, drink: 0, r: 36 }
+        ],
+        obstacles: [
+          { type:'rectWall', x:480, y:300, w:20, h:280, angle:0 },
+          { type:'block', x:240, y:200, w:100, h:20, angle:0 },
+          { type:'block', x:720, y:200, w:100, h:20, angle:0 }
+        ],
+        lines: [],
+        bg: 1
+      },
+      {
+        name: '臭水净化',
+        gourd: { x: 200, y: 100, total: 100, current: 100, r: 28, dirty: true },
+        frogs: [{ x: 800, y: 560, need: 50, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'rectWall', x:400, y:200, w:20, h:160, angle:0 },
+          { type:'purifier', x:500, y:350, w:60, h:60, angle:0 },
+          { type:'rectWall', x:600, y:440, w:20, h:120, angle:0 }
+        ],
+        lines: [],
+        bg: 6
+      },
+      {
+        name: '加速冲刺',
+        gourd: { x: 100, y: 100, total: 90, current: 90, r: 28 },
+        frogs: [{ x: 860, y: 560, need: 45, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'accelerator', x:300, y:250, w:70, h:70, angle:0, force:0.5 },
+          { type:'rectWall', x:480, y:180, w:20, h:200, angle:0 },
+          { type:'ball', x:480, y:450, r:40 },
+          { type:'accelerator', x:680, y:400, w:70, h:70, angle:0, force:0.5 }
+        ],
+        lines: [],
+        bg: 3
+      },
+      {
+        name: '迷宫探险',
+        gourd: { x: 100, y: 80, total: 110, current: 110, r: 28 },
+        frogs: [{ x: 860, y: 560, need: 55, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'rectWall', x:200, y:200, w:20, h:200, angle:0 },
+          { type:'rectWall', x:200, y:350, w:200, h:20, angle:0 },
+          { type:'rectWall', x:400, y:200, w:20, h:200, angle:0 },
+          { type:'rectWall', x:400, y:430, w:200, h:20, angle:0 },
+          { type:'rectWall', x:600, y:200, w:20, h:200, angle:0 },
+          { type:'rectWall', x:700, y:350, w:200, h:20, angle:0 },
+          { type:'ball', x:300, y:480, r:25 },
+          { type:'ball', x:550, y:300, r:25 }
+        ],
+        lines: [],
+        bg: 7
+      },
+      {
+        name: '三蛙乱斗',
+        gourd: { x: 480, y: 80, total: 150, current: 150, r: 28 },
+        frogs: [
+          { x: 160, y: 560, need: 35, drink: 0, r: 36 },
+          { x: 480, y: 560, need: 35, drink: 0, r: 36 },
+          { x: 800, y: 560, need: 35, drink: 0, r: 36 }
+        ],
+        obstacles: [
+          { type:'rotateWall', x:300, y:280, w:120, h:18, angle:0, speed:1.5 },
+          { type:'rotateWall', x:660, y:280, w:120, h:18, angle:90, speed:-1.5 },
+          { type:'block', x:480, y:380, w:80, h:20, angle:0 },
+          { type:'ball', x:160, y:300, r:30 },
+          { type:'ball', x:800, y:300, r:30 }
+        ],
+        lines: [],
+        bg: 5
+      },
+      {
+        name: '乾坤大挪移',
+        gourd: { x: 100, y: 100, total: 80, current: 80, r: 28 },
+        frogs: [{ x: 860, y: 100, need: 40, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'teleportHat', x:200, y:400, w:70, h:70, angle:0, target:780 },
+          { type:'teleportHat', x:780, y:400, w:70, h:70, angle:0, target:200 },
+          { type:'rectWall', x:480, y:200, w:20, h:400, angle:0 },
+          { type:'ball', x:350, y:500, r:30 },
+          { type:'ball', x:650, y:500, r:30 }
+        ],
+        lines: [],
+        bg: 4
+      },
+      {
+        name: '终极挑战',
+        gourd: { x: 480, y: 80, total: 140, current: 140, r: 28 },
+        frogs: [
+          { x: 120, y: 560, need: 30, drink: 0, r: 36 },
+          { x: 480, y: 560, need: 30, drink: 0, r: 36 },
+          { x: 840, y: 560, need: 30, drink: 0, r: 36 }
+        ],
+        obstacles: [
+          { type:'rotateWall', x:250, y:250, w:100, h:16, angle:0, speed:2 },
+          { type:'rotateWall', x:480, y:300, w:120, h:16, angle:45, speed:-1.5 },
+          { type:'rotateWall', x:710, y:250, w:100, h:16, angle:90, speed:2 },
+          { type:'accelerator', x:120, y:400, w:60, h:60, angle:0, force:0.3 },
+          { type:'accelerator', x:840, y:400, w:60, h:60, angle:0, force:0.3 },
+          { type:'ball', x:350, y:450, r:25 },
+          { type:'ball', x:610, y:450, r:25 },
+          { type:'block', x:480, y:420, w:60, h:16, angle:0 }
+        ],
+        lines: [],
+        bg: 6
+      },
+      {
+        name: '风吹屁屁凉',
+        gourd: { x: 200, y: 100, total: 90, current: 90, r: 28 },
+        frogs: [{ x: 760, y: 560, need: 50, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'fan', x:400, y:350, w:80, h:80, angle:0, force:0.9 },
+          { type:'rectWall', x:300, y:250, w:20, h:200, angle:0 },
+          { type:'rectWall', x:600, y:450, w:20, h:180, angle:0 },
+          { type:'block', x:450, y:200, w:100, h:20, angle:10 }
+        ],
+        lines: [],
+        bg: 1
+      },
+      {
+        name: '水火不容',
+        gourd: { x: 480, y: 80, total: 120, current: 120, r: 28 },
+        frogs: [{ x: 480, y: 560, need: 40, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'fireBlock', x:300, y:300, w:70, h:70, angle:0 },
+          { type:'fireBlock', x:660, y:300, w:70, h:70, angle:0 },
+          { type:'fireBlock', x:480, y:400, w:70, h:70, angle:0 },
+          { type:'rectWall', x:200, y:200, w:20, h:280, angle:0 },
+          { type:'rectWall', x:760, y:200, w:20, h:280, angle:0 }
+        ],
+        lines: [],
+        bg: 3
+      },
+      {
+        name: '冰雪奇缘',
+        gourd: { x: 100, y: 100, total: 100, current: 100, r: 28 },
+        frogs: [{ x: 860, y: 560, need: 45, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'iceBlock', x:300, y:250, w:70, h:70, angle:0 },
+          { type:'iceBlock', x:500, y:350, w:70, h:70, angle:0 },
+          { type:'iceBlock', x:700, y:450, w:70, h:70, angle:0 },
+          { type:'rectWall', x:400, y:150, w:20, h:180, angle:0 },
+          { type:'rectWall', x:600, y:300, w:20, h:180, angle:0 }
+        ],
+        lines: [],
+        bg: 2
+      },
+      {
+        name: '冰火两重天',
+        gourd: { x: 480, y: 80, total: 130, current: 130, r: 28 },
+        frogs: [
+          { x: 200, y: 560, need: 30, drink: 0, r: 36 },
+          { x: 760, y: 560, need: 30, drink: 0, r: 36 }
+        ],
+        obstacles: [
+          { type:'fireBlock', x:350, y:300, w:60, h:60, angle:0 },
+          { type:'fireBlock', x:610, y:300, w:60, h:60, angle:0 },
+          { type:'iceBlock', x:480, y:400, w:70, h:70, angle:0 },
+          { type:'fan', x:480, y:200, w:80, h:80, angle:90, force:0.7 },
+          { type:'rectWall', x:480, y:500, w:200, h:20, angle:0 }
+        ],
+        lines: [],
+        bg: 5
+      },
+      {
+        name: '风扇大作战',
+        gourd: { x: 100, y: 500, total: 100, current: 100, r: 28 },
+        frogs: [{ x: 860, y: 100, need: 40, drink: 0, r: 36 }],
+        obstacles: [
+          { type:'fan', x:250, y:450, w:80, h:80, angle:-90, force:1.0 },
+          { type:'fan', x:450, y:250, w:80, h:80, angle:0, force:0.8 },
+          { type:'fan', x:650, y:200, w:80, h:80, angle:0, force:0.8 },
+          { type:'rectWall', x:150, y:300, w:20, h:250, angle:0 },
+          { type:'rectWall', x:550, y:150, w:20, h:250, angle:0 }
+        ],
+        lines: [],
+        bg: 7
+      }
+    ];
+
+    // ===== 工具函数 =====
+    function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+    function dist(a,b){ return Math.hypot(a.x-b.x, a.y-b.y); }
+    function rotX(x,y,deg){ return x*Math.cos(deg*Math.PI/180)-y*Math.sin(deg*Math.PI/180); }
+    function rotY(x,y,deg){ return x*Math.sin(deg*Math.PI/180)+y*Math.cos(deg*Math.PI/180); }
+    function uid(){ return Math.random().toString(36).slice(2,9); }
+    function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
+
+    // 点线段距离 & 投影
+    function pointSegmentDist(p, a, b) {
+      const l2 = (a.x-b.x)**2 + (a.y-b.y)**2;
+      if (l2 === 0) return { d: dist(p,a), t: 0 };
+      let t = ((p.x-a.x)*(b.x-a.x) + (p.y-a.y)*(b.y-a.y)) / l2;
+      t = clamp(t,0,1);
+      const proj = { x: a.x + t*(b.x-a.x), y: a.y + t*(b.y-a.y) };
+      return { d: dist(p, proj), t, proj };
+    }
+
+    // 线段与圆碰撞
+    function segmentCircleHit(a, b, c, r) {
+      const info = pointSegmentDist(c, a, b);
+      if (info.d <= r) {
+        let nx, ny;
+        if (info.d < 0.01) {
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const len = Math.hypot(dx, dy) || 1;
+          nx = -dy / len;
+          ny = dx / len;
+        } else {
+          nx = (c.x - info.proj.x) / info.d;
+          ny = (c.y - info.proj.y) / info.d;
+        }
+        return { hit:true, nx, ny, proj:info.proj, t:info.t };
+      }
+      return { hit:false };
+    }
+
+    // AABB旋转矩形 & 点 检测
+    function pointInRotRect(p, rect) {
+      const dx = p.x - rect.x, dy = p.y - rect.y;
+      const rx = rotX(dx, dy, -rect.angle);
+      const ry = rotY(dx, dy, -rect.angle);
+      return Math.abs(rx) <= rect.w/2 && Math.abs(ry) <= rect.h/2;
+    }
+
+    function pointInRotRectWithRadius(p, rect, r) {
+      const dx = p.x - rect.x, dy = p.y - rect.y;
+      const rx = rotX(dx, dy, -rect.angle);
+      const ry = rotY(dx, dy, -rect.angle);
+      return Math.abs(rx) <= rect.w/2 + r && Math.abs(ry) <= rect.h/2 + r;
+    }
+
+    // ===== 关卡对象工厂 =====
+    const objectDefs = {
+      gourd: { x:0, y:0, r:28, total:80, current:80, dirty:false },
+      frog: { x:0, y:0, r:36, need:50, drink:0 },
+      purifier: { x:0, y:0, w:60, h:60, angle:0 },
+      rectWall: { x:0, y:0, w:140, h:22, angle:0 },
+      rotateWall: { x:0, y:0, w:140, h:22, angle:0, speed:1 },
+      teleportHat: { x:0, y:0, w:70, h:70, angle:0, target:null },
+      accelerator: { x:0, y:0, w:70, h:70, angle:0, force:0.5 },
+      ball: { x:0, y:0, r:35 },
+      block: { x:0, y:0, w:80, h:80, angle:0 },
+      fan: { x:0, y:0, w:80, h:80, angle:90, force:0.8, spin:0 },
+      fireBlock: { x:0, y:0, w:70, h:70, angle:0 },
+      iceBlock: { x:0, y:0, w:70, h:70, angle:0 }
+    };
+
+    function createObject(type, x, y) {
+      const def = objectDefs[type] || {};
+      const obj = deepCopy(def);
+      obj.id = uid();
+      obj.type = type;
+      obj.x = x; obj.y = y;
+      return obj;
+    }
+
+    // ===== 游戏核心 =====
+    function resetLevel(lvl) {
+      level = deepCopy(lvl);
+      level.lines = [];
+      level.obstacles = level.obstacles || [];
+      // 兼容旧格式 frog -> frogs
+      if (level.frog && !level.frogs) { level.frogs = [level.frog]; delete level.frog; }
+      level.frogs = level.frogs || [];
+      if (level.gourd) { level.gourd.current = level.gourd.total; }
+      for (const f of level.frogs) { f.drink = 0; }
+      particles = [];
+      won = false; winTimer = 0;
+    }
+
+    function spawnWater() {
+      if (!level || !level.gourd || level.gourd.current <= 0 || won) return;
+      level.gourd.current--;
+      const a = (Math.random() - 0.5) * 0.3;
+      particles.push({
+        x: level.gourd.x + Math.sin(a)*4,
+        y: level.gourd.y + level.gourd.r + 4,
+        vx: Math.sin(a) * 1.2,
+        vy: 1.5,
+        r: 4 + Math.random()*2,
+        onLine: false,
+        dirty: level.gourd.dirty || false,
+        color: level.gourd.dirty ? '#8b6914' : '#3abeff'
+      });
+    }
+
+    function updatePhysics() {
+      if (!level) return;
+
+      // 更新旋转障碍物角度
+      for (const ob of level.obstacles) {
+        if (ob.type === 'rotateWall') {
+          ob.angle = (ob.angle + (ob.speed||1)) % 360;
+        }
+        if (ob.type === 'fan') {
+          ob.spin = (ob.spin || 0) * 0.95; // 风扇逐渐停转
+        }
+      }
+
+      // 重力常量
+      const G = 0.18;
+      const FRICTION = 0.985;
+
+      for (const p of particles) {
+        if (!p.onLine) {
+          p.vy += G;
+        }
+        p.vx *= FRICTION; p.vy *= FRICTION;
+
+        // 0. 水滴之间碰撞（先处理，避免被推回障碍物里）
+        for (let i = particles.indexOf(p) + 1; i < particles.length; i++) {
+          const other = particles[i];
+          const d = dist(p, other);
+          const minDist = p.r + other.r;
+          if (d < minDist && d > 0) {
+            const nx = (p.x - other.x) / d;
+            const ny = (p.y - other.y) / d;
+            const push = (minDist - d) / 2;
+            p.x += nx * push;
+            p.y += ny * push;
+            other.x -= nx * push;
+            other.y -= ny * push;
+            const relVx = p.vx - other.vx;
+            const relVy = p.vy - other.vy;
+            const dot = relVx * nx + relVy * ny;
+            if (dot < 0) {
+              const bounce = 0.3;
+              p.vx += nx * (-dot) * bounce;
+              p.vy += ny * (-dot) * bounce;
+              other.vx -= nx * (-dot) * bounce;
+              other.vy -= ny * (-dot) * bounce;
+            }
+          }
+        }
+
+        // 1. 竹子碰撞（每个竹子段当作旋转矩形障碍物）
+        const BAMBOO_THICK = 16;
+        for (const line of level.lines) {
+          if (!line.bamboos) continue;
+          for (const b of line.bamboos) {
+            const rect = { x: b.x, y: b.y, w: b.len || 20, h: BAMBOO_THICK, angle: b.angle * 180 / Math.PI };
+            if (pointInRotRectWithRadius(p, rect, p.r)) {
+              const dx = p.x - rect.x, dy = p.y - rect.y;
+              const rx = rotX(dx, dy, -rect.angle);
+              const ry = rotY(dx, dy, -rect.angle);
+              const hw = rect.w/2 + p.r, hh = rect.h/2 + p.r;
+              const overlapX = hw - Math.abs(rx);
+              const overlapY = hh - Math.abs(ry);
+              let nx = 0, ny = 0, pushDist = 0;
+              if (overlapX < overlapY) {
+                nx = rx > 0 ? 1 : -1;
+                pushDist = overlapX;
+              } else {
+                ny = ry > 0 ? 1 : -1;
+                pushDist = overlapY;
+              }
+              const wx = rotX(nx, ny, rect.angle);
+              const wy = rotY(nx, ny, rect.angle);
+              p.x += wx * pushDist;
+              p.y += wy * pushDist;
+              const dot = p.vx * wx + p.vy * wy;
+              if (dot < 0) {
+                const bounce = 0.4;
+                p.vx -= (1 + bounce) * dot * wx;
+                p.vy -= (1 + bounce) * dot * wy;
+              }
+              p.onLine = false;
+            }
+          }
+        }
+
+        // 2. 障碍物碰撞
+        for (const ob of level.obstacles) {
+          if (ob.type === 'rectWall' || ob.type === 'rotateWall' || ob.type === 'block') {
+            if (pointInRotRect(p, ob)) {
+              const dx = p.x - ob.x, dy = p.y - ob.y;
+              const rx = rotX(dx, dy, -ob.angle);
+              const ry = rotY(dx, dy, -ob.angle);
+              const hw = ob.w/2, hh = ob.h/2;
+              const overlapX = hw - Math.abs(rx);
+              const overlapY = hh - Math.abs(ry);
+              let nx = 0, ny = 0, pushDist = 0;
+              if (overlapX < overlapY) {
+                nx = rx > 0 ? 1 : -1;
+                pushDist = overlapX + p.r;
+              } else {
+                ny = ry > 0 ? 1 : -1;
+                pushDist = overlapY + p.r;
+              }
+              const wx = rotX(nx, ny, ob.angle);
+              const wy = rotY(nx, ny, ob.angle);
+              p.x += wx * pushDist;
+              p.y += wy * pushDist;
+              const dot = p.vx * wx + p.vy * wy;
+              if (dot < 0) {
+                const bounce = 0.5;
+                p.vx -= (1 + bounce) * dot * wx;
+                p.vy -= (1 + bounce) * dot * wy;
+              }
+              p.onLine = false;
+            }
+          } else if (ob.type === 'ball') {
+            const d = dist(p, ob);
+            if (d < p.r + ob.r) {
+              const nx = (p.x - ob.x) / (d || 1);
+              const ny = (p.y - ob.y) / (d || 1);
+              const push = p.r + ob.r - d;
+              p.x += nx * push;
+              p.y += ny * push;
+              const dot = p.vx * nx + p.vy * ny;
+              if (dot < 0) {
+                const bounce = 0.6;
+                p.vx -= (1 + bounce) * dot * nx;
+                p.vy -= (1 + bounce) * dot * ny;
+              }
+              p.onLine = false;
+            }
+          } else if (ob.type === 'accelerator') {
+            if (pointInRotRect(p, {x:ob.x,y:ob.y,w:ob.w-10,h:ob.h-10,angle:ob.angle})) {
+              const rad = ob.angle * Math.PI / 180;
+              p.vx += Math.cos(rad) * (ob.force || 0.5);
+              p.vy += Math.sin(rad) * (ob.force || 0.5);
+            }
+          } else if (ob.type === 'teleportHat') {
+            if (pointInRotRect(p, {x:ob.x,y:ob.y,w:ob.w-10,h:ob.h-10,angle:ob.angle}) && !p.teleported) {
+              const target = level.obstacles.find(o => o.id === ob.target && o.type === 'teleportHat');
+              if (target) {
+                p.x = target.x; p.y = target.y;
+                p.vx *= 0.5; p.vy *= 0.5;
+                p.teleported = true;
+                setTimeout(()=> p.teleported = false, 300);
+              }
+            }
+          } else if (ob.type === 'purifier') {
+            if (pointInRotRect(p, {x:ob.x,y:ob.y,w:ob.w-8,h:ob.h-8,angle:ob.angle})) {
+              p.dirty = false;
+              p.color = '#3abeff'; // 净化后变蓝
+            }
+          } else if (ob.type === 'fan') {
+            // 风扇：水滴进入范围时被吹走，风扇转动
+            const fanRange = 120;
+            const d = dist(p, ob);
+            if (d < fanRange) {
+              const rad = ob.angle * Math.PI / 180;
+              const fx = Math.cos(rad), fy = Math.sin(rad);
+              const toP = { x: p.x - ob.x, y: p.y - ob.y };
+              const along = toP.x * fx + toP.y * fy;
+              if (along > 0) {
+                const strength = (ob.force || 0.8) * (1 - d / fanRange);
+                p.vx += fx * strength;
+                p.vy += fy * strength;
+                ob.spin = (ob.spin || 0) + 0.5;
+              }
+            }
+          } else if (ob.type === 'fireBlock') {
+            if (pointInRotRect(p, {x:ob.x,y:ob.y,w:ob.w-5,h:ob.h-5,angle:ob.angle})) {
+              p.dead = true;
+            }
+          } else if (ob.type === 'iceBlock') {
+            if (pointInRotRect(p, {x:ob.x,y:ob.y,w:ob.w-5,h:ob.h-5,angle:ob.angle})) {
+              p.vx *= 0.95;
+              p.vy *= 0.95;
+            }
+          }
+        }
+
+        // 3. 边界
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < p.r) { p.x = p.r; p.vx *= -0.5; }
+        if (p.x > WIDTH - p.r) { p.x = WIDTH - p.r; p.vx *= -0.5; }
+        if (p.y > HEIGHT - p.r) { p.y = HEIGHT - p.r; p.vy *= -0.3; p.onLine=false; }
+
+        // 4. 青蛙喝水（臭水不能喝，喝饱了就不再喝）
+        for (const f of level.frogs) {
+          if (f.drink >= f.need) continue;
+          if (dist(p, f) < f.r + p.r + 4) {
+            if (!p.dirty) {
+              f.drink++;
+            }
+            const idx = particles.indexOf(p);
+            if (idx >= 0) particles.splice(idx, 1);
+            break;
+          }
+        }
+      }
+
+      // 胜利判定：所有奶蛙都喝够水
+      if (!won && level.frogs.length > 0 && level.frogs.every(f => f.drink >= f.need)) {
+        won = true; winTimer = 60;
+      }
+
+      // 移除死亡粒子（火块烧掉的）
+      for (let i = particles.length - 1; i >= 0; i--) {
+        if (particles[i].dead) particles.splice(i, 1);
+      }
+    }
+
+    // ===== 渲染 =====
+    function drawBackground() {
+      const bgName = backgrounds[currentBg];
+      const bgImg = imgs[bgName];
+      if (bgImg) {
+        const ratio = WIDTH / HEIGHT;
+        const imgRatio = bgImg.width / bgImg.height;
+        let dw = WIDTH, dh = HEIGHT, dx = 0, dy = 0;
+        if (imgRatio > ratio) {
+          dw = HEIGHT * imgRatio;
+          dx = (WIDTH - dw) / 2;
+        } else {
+          dh = WIDTH / imgRatio;
+          dy = (HEIGHT - dh) / 2;
+        }
+        ctx.drawImage(bgImg, dx, dy, dw, dh);
+      } else {
+        const grad = ctx.createLinearGradient(0,0,0,HEIGHT);
+        grad.addColorStop(0, '#4facfe');
+        grad.addColorStop(1, '#00f2fe');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0,0,WIDTH,HEIGHT);
+      }
+    }
+
+    function drawTree(x, y, s) {
+      ctx.save();
+      ctx.translate(x, y); ctx.scale(s, s);
+      ctx.fillStyle = '#8B4513';
+      ctx.fillRect(-10, 0, 20, 50);
+      ctx.fillStyle = '#228B22';
+      ctx.beginPath();
+      ctx.arc(0, -20, 45, 0, Math.PI*2);
+      ctx.arc(-30, 0, 30, 0, Math.PI*2);
+      ctx.arc(30, 0, 30, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawObstacle(ob) {
+      ctx.save();
+      ctx.translate(ob.x, ob.y);
+      ctx.rotate(ob.angle * Math.PI / 180);
+      if (ob.type === 'rectWall' || ob.type === 'rotateWall') {
+        const isRot = ob.type === 'rotateWall';
+        // 竹节纹理
+        ctx.fillStyle = isRot ? '#d4a76a' : '#8bc34a';
+        ctx.strokeStyle = '#4a6b21';
+        ctx.lineWidth = 3;
+        roundRect(-ob.w/2, -ob.h/2, ob.w, ob.h, 6, true, true);
+        ctx.strokeStyle = isRot ? '#8c6a3a' : '#5d8a2a';
+        ctx.lineWidth = 2;
+        for (let i=-ob.w/2+18; i<ob.w/2; i+=22) {
+          ctx.beginPath(); ctx.moveTo(i, -ob.h/2); ctx.lineTo(i, ob.h/2); ctx.stroke();
+        }
+      } else if (ob.type === 'block') {
+        ctx.fillStyle = '#a1887f';
+        ctx.strokeStyle = '#5d4037';
+        ctx.lineWidth = 3;
+        roundRect(-ob.w/2, -ob.h/2, ob.w, ob.h, 4, true, true);
+      } else if (ob.type === 'purifier') {
+        ctx.fillStyle = '#81d4fa';
+        ctx.strokeStyle = '#0277bd';
+        ctx.lineWidth = 3;
+        roundRect(-ob.w/2, -ob.h/2, ob.w, ob.h, 8, true, true);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('净化', 0, 0);
+      } else if (ob.type === 'accelerator') {
+        ctx.fillStyle = '#ffcc80';
+        ctx.strokeStyle = '#ef6c00';
+        ctx.lineWidth = 3;
+        roundRect(-ob.w/2, -ob.h/2, ob.w, ob.h, 8, true, true);
+        ctx.fillStyle = '#e65100';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('>>', 0, 0);
+      } else if (ob.type === 'teleportHat') {
+        ctx.fillStyle = '#7e57c2';
+        ctx.strokeStyle = '#4527a0';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, ob.w/2, ob.h/2, 0, 0, Math.PI*2);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('传送', 0, 0);
+      } else if (ob.type === 'ball') {
+        const grad = ctx.createRadialGradient(-ob.r*0.3, -ob.r*0.3, ob.r*0.1, 0, 0, ob.r);
+        grad.addColorStop(0, '#ff8a80'); grad.addColorStop(1, '#d32f2f');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(0,0,ob.r,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#b71c1c'; ctx.lineWidth = 3; ctx.stroke();
+      } else if (ob.type === 'fan') {
+        // 风扇底座
+        ctx.fillStyle = '#455a64';
+        ctx.strokeStyle = '#263238';
+        ctx.lineWidth = 3;
+        roundRect(-ob.w/2, -ob.h/2, ob.w, ob.h, 8, true, true);
+        // 风扇叶片（旋转）
+        ctx.save();
+        ctx.rotate((ob.spin || 0) * Math.PI / 180);
+        ctx.fillStyle = '#b0bec5';
+        for (let i=0;i<4;i++) {
+          ctx.save();
+          ctx.rotate(i * 90 * Math.PI / 180);
+          ctx.beginPath();
+          ctx.ellipse(ob.w/4, 0, ob.w/4, 6, 0, 0, Math.PI*2);
+          ctx.fill();
+          ctx.restore();
+        }
+        // 中心圆
+        ctx.fillStyle = '#546e7a';
+        ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+        // 方向箭头
+        ctx.fillStyle = '#ffeb3b';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('▶', ob.w/2+8, 0);
+      } else if (ob.type === 'fireBlock') {
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, ob.w/2);
+        grad.addColorStop(0, '#ffeb3b');
+        grad.addColorStop(0.4, '#ff9800');
+        grad.addColorStop(0.7, '#f44336');
+        grad.addColorStop(1, '#8b0000');
+        ctx.fillStyle = grad;
+        ctx.strokeStyle = '#5d0000';
+        ctx.lineWidth = 3;
+        roundRect(-ob.w/2, -ob.h/2, ob.w, ob.h, 8, true, true);
+        // 火焰图标
+        ctx.fillStyle = '#ffeb3b';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('🔥', 0, 0);
+      } else if (ob.type === 'iceBlock') {
+        const grad = ctx.createLinearGradient(-ob.w/2, -ob.h/2, ob.w/2, ob.h/2);
+        grad.addColorStop(0, '#b3e5fc');
+        grad.addColorStop(0.5, '#81d4fa');
+        grad.addColorStop(1, '#4fc3f7');
+        ctx.fillStyle = grad;
+        ctx.strokeStyle = '#0288d1';
+        ctx.lineWidth = 3;
+        roundRect(-ob.w/2, -ob.h/2, ob.w, ob.h, 8, true, true);
+        // 雪花图标
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('❄', 0, 0);
+      }
+      ctx.restore();
+    }
+
+    function roundRect(x, y, w, h, r, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x+r, y);
+      ctx.arcTo(x+w, y, x+w, y+h, r);
+      ctx.arcTo(x+w, y+h, x, y+h, r);
+      ctx.arcTo(x, y+h, x, y, r);
+      ctx.arcTo(x, y, x+w, y, r);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function drawGourd(g) {
+      ctx.save();
+      ctx.translate(g.x, g.y);
+      if (imgs.gourd) {
+        const s = (g.r*2.4) / Math.max(imgs.gourd.width, imgs.gourd.height);
+        ctx.drawImage(imgs.gourd, -imgs.gourd.width*s/2, -imgs.gourd.height*s/2, imgs.gourd.width*s, imgs.gourd.height*s);
+      } else {
+        ctx.fillStyle = '#fdd835';
+        ctx.beginPath(); ctx.ellipse(0, -12, g.r*0.9, g.r*1.1, 0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(0, 12, g.r*1.1, g.r*0.9, 0,0,Math.PI*2); ctx.fill();
+      }
+      // 水量+水质（只在游戏模式显示）
+      if (screen === 'play') {
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${Math.floor(g.current)}/${g.total}`, 0, -g.r-18);
+        if (g.dirty) {
+          ctx.fillStyle = '#8b6914'; ctx.font = 'bold 13px sans-serif';
+          ctx.fillText('臭水', 0, -g.r-4);
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawFrog(f) {
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      const isFull = f.drink >= f.need;
+      if (imgs.frog) {
+        const s = (f.r*2.8) / Math.max(imgs.frog.width, imgs.frog.height);
+        ctx.drawImage(imgs.frog, -imgs.frog.width*s/2, -imgs.frog.height*s/2, imgs.frog.width*s, imgs.frog.height*s);
+      } else {
+        // 喝饱时变金色
+        ctx.fillStyle = isFull ? '#ffd700' : '#ffeb3b';
+        ctx.beginPath(); ctx.arc(0,0,f.r,0,Math.PI*2); ctx.fill();
+        if (isFull) {
+          ctx.strokeStyle = '#ff8800';
+          ctx.lineWidth = 4;
+          ctx.stroke();
+        }
+      }
+      // 喝水进度（只在游戏模式显示）
+      if (screen === 'play') {
+        ctx.fillStyle = isFull ? '#4caf50' : '#fff';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(isFull ? '😋 饱了!' : `${f.drink}/${f.need}`, 0, f.r+18);
+      }
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      for (const p of particles) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = p.color || '#3abeff';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 1; ctx.stroke();
+      }
+    }
+
+    function drawLines() {
+      // 绘制竹子段（一个个小矩形）
+      for (const line of level.lines) {
+        if (!line.bamboos) continue;
+        for (const b of line.bamboos) {
+          ctx.save();
+          ctx.translate(b.x, b.y);
+          ctx.rotate(b.angle);
+          const bw = b.len || 18, bh = 16;
+          // 竹身
+          const grad = ctx.createLinearGradient(0, -bh/2, 0, bh/2);
+          grad.addColorStop(0, '#4a7c2e');
+          grad.addColorStop(0.5, '#7cb84a');
+          grad.addColorStop(1, '#3a5c22');
+          ctx.fillStyle = grad;
+          ctx.fillRect(-bw/2, -bh/2, bw, bh);
+          // 竹节环
+          ctx.strokeStyle = '#2d4a18';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(-bw/2+2, -bh/2); ctx.lineTo(-bw/2+2, bh/2);
+          ctx.moveTo(bw/2-2, -bh/2); ctx.lineTo(bw/2-2, bh/2);
+          ctx.stroke();
+          // 高光
+          ctx.fillStyle = 'rgba(255,255,255,0.2)';
+          ctx.fillRect(-bw/2+1, -bh/2+1, bw-2, 2);
+          ctx.restore();
+        }
+      }
+      // 当前正在画（显示画笔轨迹）
+      if (screen === 'play' && currentLine && currentLine.pts.length > 1) {
+        ctx.strokeStyle = 'rgba(111,168,60,0.5)'; ctx.lineWidth = 12;
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(currentLine.pts[0].x, currentLine.pts[0].y);
+        for (let i=1;i<currentLine.pts.length;i++) ctx.lineTo(currentLine.pts[i].x, currentLine.pts[i].y);
+        ctx.stroke();
+      }
+    }
+
+    function drawEditor() {
+      drawBackground();
+      if (!level) return;
+      for (const ob of level.obstacles) drawObstacle(ob);
+      if (level.gourd) drawGourd(level.gourd);
+      if (level.frogs) for (const f of level.frogs) drawFrog(f);
+
+      // 选中高亮
+      if (editor.selectedObj) {
+        const o = editor.selectedObj;
+        ctx.save();
+        ctx.strokeStyle = '#ffeb3b';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6,4]);
+        if (o.r) {
+          ctx.beginPath(); ctx.arc(o.x,o.y,o.r+6,0,Math.PI*2); ctx.stroke();
+        } else {
+          ctx.translate(o.x,o.y); ctx.rotate(o.angle*Math.PI/180);
+          ctx.strokeRect(-o.w/2-4, -o.h/2-4, o.w+8, o.h+8);
+        }
+        ctx.restore();
+      }
+    }
+
+    function drawPlay() {
+      drawBackground();
+      if (!level) return;
+      for (const ob of level.obstacles) drawObstacle(ob);
+      drawLines();
+      if (level.gourd) drawGourd(level.gourd);
+      if (level.frogs) for (const f of level.frogs) drawFrog(f);
+      drawParticles();
+
+      if (won) {
+        winTimer--;
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillRect(0,0,WIDTH,HEIGHT);
+        ctx.fillStyle = '#ffeb3b';
+        ctx.font = 'bold 56px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('奶蛙喝饱了！', WIDTH/2, HEIGHT/2);
+        ctx.font = '24px sans-serif';
+        ctx.fillStyle = '#fff';
+        ctx.fillText('点击任意处返回', WIDTH/2, HEIGHT/2+50);
+        ctx.restore();
+      }
+    }
+
+    function drawMenu() {
+      drawBackground();
+      // 菜单层由DOM处理，这里只画背景装饰
+      if (imgs.frog) {
+        ctx.save();
+        ctx.translate(170, HEIGHT-140);
+        ctx.scale(0.8, 0.8);
+        const s = 180 / Math.max(imgs.frog.width, imgs.frog.height);
+        ctx.drawImage(imgs.frog, -imgs.frog.width*s/2, -imgs.frog.height*s/2, imgs.frog.width*s, imgs.frog.height*s);
+        ctx.restore();
+      }
+    }
+
+    function drawSelect() {
+      drawBackground();
+    }
+
+    function render() {
+      ctx.clearRect(0,0,WIDTH,HEIGHT);
+      if (screen === 'menu') drawMenu();
+      else if (screen === 'levelSelect') drawSelect();
+      else if (screen === 'play') drawPlay();
+      else if (screen === 'editor') drawEditor();
+    }
+
+    // ===== 输入 =====
+    let currentLine = null;
+
+    function resizeCanvas() {
+      const container = document.querySelector('.game-container');
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      const gameRatio = WIDTH / HEIGHT;
+      const containerRatio = containerWidth / containerHeight;
+      let renderWidth, renderHeight;
+      if (containerRatio > gameRatio) {
+        renderHeight = containerHeight;
+        renderWidth = containerHeight * gameRatio;
+      } else {
+        renderWidth = containerWidth;
+        renderHeight = containerWidth / gameRatio;
+      }
+      canvas.width = WIDTH;
+      canvas.height = HEIGHT;
+      canvas.style.width = renderWidth + 'px';
+      canvas.style.height = renderHeight + 'px';
+      canvasScale = renderWidth / WIDTH;
+      canvasOffset.x = (containerWidth - renderWidth) / 2;
+      canvasOffset.y = (containerHeight - renderHeight) / 2;
+    }
+
+    function getMousePos(e) {
+      const rect = canvas.getBoundingClientRect();
+      return { 
+        x: (e.clientX - rect.left) * (WIDTH / rect.width), 
+        y: (e.clientY - rect.top) * (HEIGHT / rect.height) 
+      };
+    }
+
+    canvas.addEventListener('mousedown', e => {
+      const pos = getMousePos(e);
+      mouse.x = pos.x; mouse.y = pos.y;
+      mouse.down = true; mouse.justDown = true;
+      handlePress(pos.x, pos.y);
+    });
+    canvas.addEventListener('mousemove', e => {
+      const pos = getMousePos(e);
+      mouse.x = pos.x; mouse.y = pos.y;
+      handleMove(pos.x, pos.y);
+    });
+    canvas.addEventListener('dblclick', e => {
+      if (screen !== 'editor' || !editor.selectedTool) return;
+      editor.dragging = false;
+      const pos = getMousePos(e);
+      const obj = createObject(editor.selectedTool, pos.x, pos.y);
+      if (editor.selectedTool === 'gourd') { level.gourd = obj; }
+      else if (editor.selectedTool === 'frog') { level.frogs.push(obj); }
+      else { level.obstacles.push(obj); }
+      editor.selectedObj = obj;
+      updatePropPanel();
+    });
+    window.addEventListener('mouseup', () => { mouse.down = false; mouse.justUp = true; handleRelease(); });
+    window.addEventListener('keydown', e => {
+      keys[e.code] = true;
+      if (screen === 'editor') {
+        // 在输入框中编辑时不触发快捷键
+        const inInput = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+        if (inInput) return;
+        if (e.code === 'Delete' || e.code === 'Backspace') {
+          if (editor.selectedObj) deleteSelected();
+        } else if ((e.ctrlKey || e.metaKey) && e.code === 'KeyD') {
+          e.preventDefault();
+          if (editor.selectedObj) copySelected();
+        } else if (e.code === 'Escape' || e.code === 'Space') {
+          editor.selectedTool = null;
+          editor.selectedObj = null;
+          document.querySelectorAll('#editor-left .item').forEach(i => i.classList.remove('selected'));
+          document.querySelector('#editor-left .item[data-type="null"]')?.classList.add('selected');
+          editor.modeText = '选择';
+          document.getElementById('editor-mode').textContent = editor.modeText;
+          updatePropPanel();
+        }
+      }
+    });
+    window.addEventListener('keyup', e => { keys[e.code] = false; });
+
+    function handlePress(x, y) {
+      if (screen === 'play') {
+        if (won) {
+          // 通关后返回：根据来源决定
+          if (currentLevelSource === 'editor') setScreen('editor');
+          else if (currentLevelSource === 'custom') setScreen('customLevels');
+          else setScreen('levelSelect');
+          return;
+        }
+        // 检查点击葫芦
+        if (level && level.gourd && dist({x,y}, level.gourd) < level.gourd.r + 30) {
+          // 持续出水由 update 处理
+          level.gourd.pouring = true;
+          return;
+        }
+        currentLine = { pts: [{x,y}] };
+      } else if (screen === 'editor') {
+        // 配对模式：点击另一个传送门完成配对
+        if (editor.pairingFrom) {
+          const picked = pickObject(x, y);
+          if (picked && picked.type === 'teleportHat' && picked !== editor.pairingFrom) {
+            editor.pairingFrom.target = picked.id;
+            picked.target = editor.pairingFrom.id;
+            editor.pairingFrom = null;
+            editor.modeText = '选择';
+            document.getElementById('editor-mode').textContent = editor.modeText;
+            updatePropPanel();
+          } else {
+            editor.pairingFrom = null;
+            editor.modeText = '选择';
+            document.getElementById('editor-mode').textContent = editor.modeText;
+          }
+          return;
+        }
+        if (editor.selectedTool) {
+          const obj = createObject(editor.selectedTool, x, y);
+          if (editor.selectedTool === 'gourd') { level.gourd = obj; }
+          else if (editor.selectedTool === 'frog') { level.frogs.push(obj); }
+          else { level.obstacles.push(obj); }
+          editor.selectedObj = obj;
+          updatePropPanel();
+        } else {
+          const picked = pickObject(x, y);
+          editor.selectedObj = picked;
+          updatePropPanel();
+          if (picked) {
+            editor.dragging = true;
+            editor.dragOffset = { x: x - picked.x, y: y - picked.y };
+          }
+        }
+      }
+    }
+
+    function handleMove(x, y) {
+      if (screen === 'play') {
+        if (mouse.down && currentLine) {
+          const last = currentLine.pts[currentLine.pts.length-1];
+          if (dist({x,y}, last) > 6) {
+            currentLine.pts.push({x,y});
+            // 限制点数，防止太卡
+            if (currentLine.pts.length > 300) currentLine.pts.shift();
+          }
+        }
+      } else if (screen === 'editor') {
+        if (editor.dragging && editor.selectedObj) {
+          const o = editor.selectedObj;
+          o.x = x - editor.dragOffset.x;
+          o.y = y - editor.dragOffset.y;
+          updatePropPanel();
+        }
+      }
+    }
+
+    function handleRelease() {
+      if (screen === 'play') {
+        if (currentLine && currentLine.pts.length > 1) {
+          // 生成竹子段
+          currentLine.bamboos = generateBamboos(currentLine.pts);
+          level.lines.push(currentLine);
+        }
+        currentLine = null;
+        if (level && level.gourd) level.gourd.pouring = false;
+      } else if (screen === 'editor') {
+        editor.dragging = false;
+      }
+    }
+
+    // 根据画线点生成竹子段（每个段是一个旋转矩形）
+    function generateBamboos(pts) {
+      const bamboos = [];
+      const step = 18; // 每段竹子的长度
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = pts[i], b = pts[i+1];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const len = Math.hypot(dx, dy);
+        if (len < 1) continue;
+        const angle = Math.atan2(dy, dx);
+        const count = Math.max(1, Math.ceil(len / step));
+        for (let j = 0; j < count; j++) {
+          const t = (j + 0.5) / count;
+          const segLen = len / count;
+          bamboos.push({
+            x: a.x + dx * t,
+            y: a.y + dy * t,
+            angle: angle,
+            len: segLen + 2 // 稍微重叠一点避免缝隙
+          });
+        }
+      }
+      return bamboos;
+    }
+
+    function pickObject(x, y) {
+      if (!level) return null;
+      // 后放优先
+      for (let i=level.obstacles.length-1;i>=0;i--) {
+        const o = level.obstacles[i];
+        if (o.r) { if (dist({x,y}, o) < o.r + 6) return o; }
+        else if (pointInRotRect({x,y}, {x:o.x,y:o.y,w:o.w+12,h:o.h+12,angle:o.angle})) return o;
+      }
+      if (level.gourd && dist({x,y}, level.gourd) < level.gourd.r + 8) return level.gourd;
+      if (level.frogs) for (const f of level.frogs) { if (dist({x,y}, f) < f.r + 8) return f; }
+      return null;
+    }
+
+    function deleteSelected() {
+      if (!editor.selectedObj) return;
+      const o = editor.selectedObj;
+      if (level.gourd === o) level.gourd = null;
+      else {
+        const fidx = level.frogs.indexOf(o);
+        if (fidx >= 0) level.frogs.splice(fidx, 1);
+        else {
+          const idx = level.obstacles.indexOf(o);
+          if (idx >= 0) level.obstacles.splice(idx, 1);
+        }
+      }
+      editor.selectedObj = null;
+      updatePropPanel();
+    }
+
+    function copySelected() {
+      if (!editor.selectedObj) return;
+      const o = editor.selectedObj;
+      const copy = deepCopy(o);
+      copy.id = uid();
+      copy.x += 30;
+      copy.y += 30;
+      if (level.gourd === o) {
+        // 葫芦只能有一个
+        copy.x = o.x + 50;
+        copy.y = o.y + 50;
+        level.obstacles.push(copy);
+      } else if (level.frogs.includes(o)) {
+        level.frogs.push(copy);
+      } else {
+        level.obstacles.push(copy);
+      }
+      editor.selectedObj = copy;
+      updatePropPanel();
+    }
+
+    // ===== UI 交互 =====
+    function setScreen(s) {
+      screen = s;
+      const uiLayers = ['menu-ui', 'select-ui', 'play-ui', 'editor-ui'];
+      uiLayers.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.remove('active');
+        }
+      });
+      if (s === 'menu') {
+        document.getElementById('menu-ui').classList.add('active');
+      } else if (s === 'levelSelect' || s === 'customLevels') {
+        document.getElementById('select-ui').classList.add('active');
+        refreshLevelList(s === 'levelSelect' ? 'official' : 'custom');
+      } else if (s === 'play') {
+        document.getElementById('play-ui').classList.add('active');
+      } else if (s === 'editor') {
+        document.getElementById('editor-ui').classList.add('active');
+      }
+    }
+
+    document.body.addEventListener('click', e => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      if (action === 'official') setScreen('levelSelect');
+      else if (action === 'custom') setScreen('customLevels');
+      else if (action === 'editor') { enterEditor(); setScreen('editor'); }
+      else if (action === 'back') {
+        if (screen === 'play') {
+          // 游戏中返回 → 回关卡选择
+          if (currentLevelSource === 'editor') {
+            setScreen('editor');
+          } else if (currentLevelSource === 'custom') {
+            setScreen('customLevels');
+          } else {
+            setScreen('levelSelect');
+          }
+        } else if (screen === 'editor') {
+          // 编辑器返回 → 回自制关卡列表
+          setScreen('customLevels');
+        } else if (screen === 'levelSelect' || screen === 'customLevels') {
+          // 关卡列表返回 → 回主菜单
+          setScreen('menu');
+        } else {
+          setScreen('menu');
+        }
+      }
+      else if (action === 'switch-bg') {
+        currentBg = (currentBg + 1) % backgrounds.length;
+        btn.textContent = `切换背景 (${currentBg+1}/${backgrounds.length})`;
+      }
+      else if (action === 'level-bg') {
+        level.bg = ((level.bg || 0) + 1) % backgrounds.length;
+        currentBg = level.bg;
+        btn.textContent = `背景: ${currentBg+1}`;
+      }
+      else if (action === 'restart') { resetLevel(level); }
+      else if (action === 'clear-lines') { if (level) level.lines = []; }
+      else if (action === 'test-level') { testLevel(); }
+      else if (action === 'publish-level') { publishLevel(); }
+      else if (action === 'load-level') { loadLevelDialog(); }
+      else if (action === 'export-level') { exportLevel(); }
+      else if (action === 'clear-level') { clearEditorLevel(); }
+      else if (action === 'modal-ok') { closeModal(true); }
+      else if (action === 'modal-cancel') { closeModal(false); }
+      else if (action === 'pair-teleport') {
+        if (editor.selectedObj && editor.selectedObj.type === 'teleportHat') {
+          editor.pairingFrom = editor.selectedObj;
+          editor.modeText = '配对中：点击另一个传送门';
+          document.getElementById('editor-mode').textContent = editor.modeText;
+        }
+      }
+      else if (action === 'unpair-teleport') {
+        if (editor.selectedObj && editor.selectedObj.type === 'teleportHat') {
+          const partner = level.obstacles.find(t => t.id === editor.selectedObj.target);
+          if (partner) partner.target = null;
+          editor.selectedObj.target = null;
+          updatePropPanel();
+        }
+      }
+    });
+
+    document.querySelectorAll('#editor-left .item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('#editor-left .item').forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        const type = item.dataset.type;
+        editor.selectedTool = type === 'null' ? null : type;
+        editor.selectedObj = null;
+        editor.modeText = type === 'null' ? '选择' : '放置：' + item.textContent;
+        document.getElementById('editor-mode').textContent = editor.modeText;
+        updatePropPanel();
+      });
+    });
+
+    // ===== 属性面板 =====
+    function updatePropPanel() {
+      const panel = document.getElementById('prop-panel');
+      if (!editor.selectedObj) {
+        panel.innerHTML = editor.selectedTool ? `准备放置 <b>${editor.selectedTool}</b><br>在画布上点击放置` : '未选择对象';
+        return;
+      }
+      const o = editor.selectedObj;
+      let html = '';
+      html += `<div class="row">类型：${o.type}</div>`;
+      html += `<div class="row">X: <input type="number" data-prop="x" value="${Math.round(o.x)}"></div>`;
+      html += `<div class="row">Y: <input type="number" data-prop="y" value="${Math.round(o.y)}"></div>`;
+      if (o.r !== undefined) html += `<div class="row">半径: <input type="number" data-prop="r" value="${o.r}"></div>`;
+      if (o.w !== undefined) html += `<div class="row">宽度: <input type="number" data-prop="w" value="${o.w}"></div>`;
+      if (o.h !== undefined) html += `<div class="row">高度: <input type="number" data-prop="h" value="${o.h}"></div>`;
+      if (o.angle !== undefined) html += `<div class="row">旋转: <input type="number" data-prop="angle" value="${Math.round(o.angle)}"></div>`;
+      if (o.speed !== undefined) html += `<div class="row">转速: <input type="number" step="0.1" data-prop="speed" value="${o.speed}"></div>`;
+      if (o.force !== undefined) html += `<div class="row">力度: <input type="number" step="0.1" data-prop="force" value="${o.force}"></div>`;
+      if (o.type === 'gourd') {
+        html += `<div class="row">水量: <input type="number" data-prop="total" value="${o.total}"></div>`;
+        html += `<div class="row">水质: <select data-prop="dirty"><option value="false" ${!o.dirty?'selected':''}>纯净水</option><option value="true" ${o.dirty?'selected':''}>臭水</option></select></div>`;
+      }
+      if (o.type === 'frog') html += `<div class="row">需水量: <input type="number" data-prop="need" value="${o.need}"></div>`;
+      if (o.type === 'teleportHat') {
+        const partner = level.obstacles.find(t => t.id === o.target);
+        html += `<div class="row">配对: ${partner ? '已配对 #'+partner.id.slice(0,4) : '未配对'}</div>`;
+        html += `<div class="row"><button class="btn small" data-action="pair-teleport">配对另一传送门</button></div>`;
+        if (o.target) html += `<div class="row"><button class="btn small" data-action="unpair-teleport">取消配对</button></div>`;
+      }
+      html += `<div class="row"><button class="btn small" data-action="copy-obj">复制</button> <button class="btn small" data-action="delete-obj">删除</button></div>`;
+      panel.innerHTML = html;
+      panel.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', e => {
+          const prop = e.target.dataset.prop;
+          let val = e.target.value;
+          if (prop !== 'target') val = parseFloat(val) || 0;
+          o[prop] = val;
+        });
+        inp.addEventListener('blur', () => {
+          updatePropPanel();
+        });
+      });
+      panel.querySelectorAll('select').forEach(sel => {
+        sel.addEventListener('change', e => {
+          const prop = e.target.dataset.prop;
+          let val = e.target.value;
+          if (val === 'true') val = true;
+          else if (val === 'false') val = false;
+          o[prop] = val;
+        });
+      });
+      panel.querySelector('[data-action="delete-obj"]')?.addEventListener('click', deleteSelected);
+      panel.querySelector('[data-action="copy-obj"]')?.addEventListener('click', copySelected);
+    }
+
+    // ===== 编辑器功能 =====
+    function enterEditor() {
+      document.getElementById('level-name-input').value = '未命名关卡';
+      level = {
+        name: '未命名关卡',
+        gourd: createObject('gourd', WIDTH/2, 100),
+        frogs: [createObject('frog', WIDTH/2, HEIGHT-80)],
+        obstacles: [],
+        lines: [],
+        bg: 0
+      };
+      editor.selectedTool = null;
+      editor.selectedObj = null;
+      document.querySelectorAll('#editor-left .item').forEach(i => i.classList.remove('selected'));
+      updatePropPanel();
+    }
+
+    function clearEditorLevel() {
+      enterEditor();
+    }
+
+    function syncLevelName() {
+      const name = document.getElementById('level-name-input').value.trim() || '未命名关卡';
+      level.name = name;
+    }
+
+    function testLevel() {
+      if (!level.gourd || !level.frogs || level.frogs.length === 0) {
+        showModal('提示', '关卡必须包含葫芦和奶蛙才能测试！'); return;
+      }
+      syncLevelName();
+      returnToEditor = true;
+      currentLevelSource = 'editor';
+      if (level.bg !== undefined) currentBg = level.bg;
+      resetLevel(level);
+      document.getElementById('level-name').textContent = level.name;
+      setScreen('play');
+    }
+
+    function publishLevel() {
+      if (!level.gourd || !level.frogs || level.frogs.length === 0) {
+        showModal('提示', '关卡必须包含葫芦和奶蛙！'); return;
+      }
+      syncLevelName();
+      const lvl = deepCopy(level);
+      lvl.lines = []; // 发布时不带玩家画线
+      const list = getCustomLevels();
+      lvl.id = uid();
+      lvl.author = '玩家';
+      lvl.likes = 0; lvl.dislikes = 0;
+      list.push(lvl);
+      saveCustomLevels(list);
+      showModal('发布成功', '关卡已保存到玩家自制！');
+    }
+
+    function exportLevel() {
+      if (!level) return;
+      syncLevelName();
+      const data = JSON.stringify(level, null, 2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = (level.name||'level')+'.json';
+      a.click(); URL.revokeObjectURL(url);
+    }
+
+    function loadLevelDialog() {
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = '.json';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            level = data; level.lines = level.lines || [];
+            // 兼容旧格式
+            if (level.frog && !level.frogs) { level.frogs = [level.frog]; delete level.frog; }
+            level.frogs = level.frogs || [];
+            document.getElementById('level-name-input').value = level.name || '未命名关卡';
+            updatePropPanel();
+            showModal('加载成功', `已加载关卡：${level.name}`);
+          } catch(err) { showModal('错误', '文件解析失败'); }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    // ===== 关卡列表 =====
+    function getCustomLevels() {
+      try { return JSON.parse(localStorage.getItem('milkFrogCustomLevels') || '[]'); }
+      catch(e) { return []; }
+    }
+    function saveCustomLevels(list) {
+      localStorage.setItem('milkFrogCustomLevels', JSON.stringify(list));
+    }
+
+    function refreshLevelList(kind) {
+      const container = document.getElementById('level-list');
+      container.innerHTML = '';
+      const list = kind === 'official' ? officialLevels : getCustomLevels();
+      document.getElementById('select-title').textContent = kind === 'official' ? '官方关卡' : '玩家自制';
+      if (!list.length) {
+        container.innerHTML = '<div style="color:#fff;text-align:center;font-size:18px;margin-top:40px">暂无关卡</div>';
+        return;
+      }
+      list.forEach((lvl, idx) => {
+        const card = document.createElement('div');
+        card.className = 'level-card';
+        const frogs = lvl.frogs || (lvl.frog ? [lvl.frog] : []);
+        const totalNeed = frogs.reduce((s,f) => s + (f.need||0), 0);
+        const bgColors = ['#4facfe','#00f2fe','#ff6b6b','#ffa502','#1a1a2e','#16213e','#7ec850','#4a9c2d'];
+        const bgColor = bgColors[lvl.bg || 0] || '#4facfe';
+        // 生成迷你预览
+        const g = lvl.gourd || {};
+        let previewDots = '';
+        if (g.x) previewDots += `<div style="position:absolute;left:${g.x/9.6}%;top:${g.y/6}%;width:6px;height:6px;background:#8B4513;border-radius:50%;transform:translate(-50%,-50%);"></div>`;
+        frogs.forEach(f => {
+          if (f.x) previewDots += `<div style="position:absolute;left:${f.x/9.6}%;top:${f.y/6}%;width:8px;height:8px;background:#90EE90;border-radius:50%;transform:translate(-50%,-50%);"></div>`;
+        });
+        if (lvl.obstacles) lvl.obstacles.forEach(ob => {
+          if (ob.type === 'ball') previewDots += `<div style="position:absolute;left:${ob.x/9.6}%;top:${ob.y/6}%;width:5px;height:5px;background:#666;border-radius:50%;transform:translate(-50%,-50%);"></div>`;
+          else if (ob.x) previewDots += `<div style="position:absolute;left:${ob.x/9.6}%;top:${ob.y/6}%;width:8px;height:3px;background:#888;transform:translate(-50%,-50%) rotate(${ob.angle||0}deg);"></div>`;
+        });
+        card.innerHTML = `
+          <div class="thumb" style="background:${bgColor};position:relative;overflow:hidden;">${previewDots}</div>
+          <div class="info">
+            <div class="title">${lvl.name}</div>
+            <div class="meta">${kind==='custom' ? '作者：'+lvl.author+' | ' : ''}奶蛙 ${frogs.length} | 需水 ${totalNeed}</div>
+          </div>
+          ${kind==='custom' ? `<div style="color:#ffd54f">👍 ${lvl.likes}</div>` : ''}
+        `;
+        card.addEventListener('click', () => {
+          if (lvl.bg !== undefined) currentBg = lvl.bg;
+          currentLevelSource = kind;
+          resetLevel(lvl);
+          document.getElementById('level-name').textContent = lvl.name;
+          setScreen('play');
+        });
+        container.appendChild(card);
+      });
+    }
+
+    // ===== 弹窗 =====
+    let modalCallback = null;
+    function showModal(title, body, cb) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').innerHTML = `<p>${body}</p>`;
+      document.getElementById('modal').classList.add('active');
+      modalCallback = cb || null;
+    }
+    function closeModal(ok) {
+      document.getElementById('modal').classList.remove('active');
+      if (modalCallback) modalCallback(ok);
+      modalCallback = null;
+    }
+
+    // ===== 面板拖拽（事件委托版，全局生效） =====
+    let dragState = null;
+    document.addEventListener('mousedown', e => {
+      const el = e.target.closest('.wood-tip, #play-bottom, .draggable-btn, #editor-right');
+      if (!el) return;
+      // 按钮容器的拖动模式：点击按钮本身时不拖
+      if (el.classList.contains('draggable-btn')) {
+        // 可拖动按钮：如果是按钮自身被点，不拖
+        if (e.target.tagName === 'BUTTON') return;
+      }
+      // 输入框/下拉框/按钮不拖
+      const tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'select' || tag === 'textarea' || tag === 'button') return;
+      e.preventDefault();
+      const rect = el.getBoundingClientRect();
+      const prect = el.offsetParent ? el.offsetParent.getBoundingClientRect() : {left:0, top:0};
+      dragState = {
+        el,
+        offsetX: e.clientX - rect.left,
+        offsetY: e.clientY - rect.top,
+        parentLeft: prect.left,
+        parentTop: prect.top,
+        moved: false
+      };
+    });
+    window.addEventListener('mousemove', e => {
+      if (!dragState) return;
+      dragState.moved = true;
+      let x = e.clientX - dragState.parentLeft - dragState.offsetX;
+      let y = e.clientY - dragState.parentTop - dragState.offsetY;
+      const maxX = window.innerWidth - dragState.el.offsetWidth;
+      const maxY = window.innerHeight - dragState.el.offsetHeight;
+      x = Math.max(0, Math.min(maxX, x));
+      y = Math.max(0, Math.min(maxY, y));
+      dragState.el.style.left = x + 'px';
+      dragState.el.style.top = y + 'px';
+      dragState.el.style.right = 'auto';
+      dragState.el.style.bottom = 'auto';
+    });
+    let pendingClickPrevent = false;
+    window.addEventListener('mouseup', () => {
+      if (dragState && dragState.moved) pendingClickPrevent = true;
+      dragState = null;
+    });
+    document.addEventListener('click', e => {
+      if (pendingClickPrevent) {
+        pendingClickPrevent = false;
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }, true);
+
+    // ===== 主循环 =====
+    function start() {
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      setScreen('menu');
+      requestAnimationFrame(loop);
+    }
+
+    function loop(t) {
+      const dt = t - lastTime; lastTime = t;
+
+      // 出水逻辑：按住葫芦或自动pour状态
+      if (screen === 'play' && level && level.gourd && level.gourd.pouring && !won) {
+        // 每帧出一个，但限制一下数量
+        if (particles.length < 400 && level.gourd.current > 0 && Math.random() < 0.6) {
+          spawnWater();
+        }
+      }
+
+      updatePhysics();
+      render();
+
+      mouse.justDown = false;
+      mouse.justUp = false;
+      requestAnimationFrame(loop);
+    }
+  })();
+  </script>
+</body>
+</html>
