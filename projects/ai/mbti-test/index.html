@@ -32,6 +32,29 @@
             min-height: 100vh;
         }
 
+        #returnLink {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 20;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.55rem 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #111;
+            text-decoration: none;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+            font-family: 'Adofai 2', sans-serif;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        #returnLink:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 1);
+        }
+        
         h1 {
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
@@ -135,6 +158,7 @@
 </head>
 
 <body>
+    <a id="returnLink" href="https://yang-bone.github.io/projects">返回</a>
     <h1>MBTI 测试</h1>
     <div id="progress-bar">
         <div id="progress"></div>
