@@ -98,8 +98,10 @@
                 transform: translate(-50%, -20px);
                 opacity: 0;
                 visibility: hidden;
-                width: calc(100% - 2rem);
-                max-width: 980px;
+                width: min(calc(100% - 2rem), 1180px);
+                max-width: 1180px;
+                max-height: calc(100vh - 12rem);
+                overflow-y: auto;
                 padding: 1.5rem 1.25rem;
                 background: rgba(255, 255, 255, 0.92);
                 border: 1px solid rgba(0, 0, 0, 0.12);
@@ -144,6 +146,56 @@
                 cursor: pointer;
                 font-size: 0.95rem;
             }
+            .project-controls {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.9rem;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1rem;
+            }
+            .project-search {
+                flex: 1 1 240px;
+                min-width: 220px;
+                padding: 0.95rem 1rem;
+                border: 1px solid rgba(0,0,0,0.12);
+                border-radius: 999px;
+                background: rgba(255,255,255,0.9);
+                color: #111;
+                outline: none;
+                box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+            }
+            .project-search::placeholder {
+                color: rgba(0,0,0,0.4);
+            }
+            .project-filter-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.6rem;
+                justify-content: flex-end;
+            }
+            .filter-button {
+                border: none;
+                padding: 0.7rem 1rem;
+                border-radius: 999px;
+                cursor: pointer;
+                color: #fff;
+                opacity: 0.85;
+                transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+                background: #8b8b8b;
+                min-width: 72px;
+            }
+            .filter-button.active,
+            .filter-button:hover {
+                opacity: 1;
+                transform: translateY(-1px);
+            }
+            .filter-button[data-filter="AI项目"] { background: #8b5cf6; }
+            .filter-button[data-filter="图片项目"] { background: #f59e0b; }
+            .filter-button[data-filter="小游戏"] { background: #10b981; }
+            .filter-button[data-filter="工具"] { background: #3b82f6; }
+            .filter-button[data-filter="演示"] { background: #ef4444; }
+            .filter-button[data-filter="all"] { background: #6b7280; }
             .project-grid {
                 display: grid;
                 gap: 1rem;
@@ -177,6 +229,11 @@
                 cursor: pointer;
                 display: flex;
                 flex-direction: column;
+                width: 100%;
+                max-width: 280px;
+                min-width: 0;
+                text-decoration: none;
+                color: inherit;
             }
             .project-card:hover {
                 transform: translateY(-6px);
@@ -184,9 +241,15 @@
             }
             .project-card img {
                 width: 100%;
-                height: 140px;
+                height: 160px;
                 object-fit: cover;
                 display: block;
+            }
+            .project-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.45rem;
+                margin-top: 1rem;
             }
             .project-card .project-body {
                 padding: 1rem;
@@ -233,47 +296,73 @@
                     <h2>我的项目</h2>
                     <button class="menu-toggle" type="button">收起</button>
                 </div>
+                <div class="project-controls">
+                    <input id="projectSearch" class="project-search" type="search" placeholder="搜索项目名称..." aria-label="搜索项目名称">
+                    <div class="project-filter-buttons">
+                        <button class="filter-button active" data-filter="all">全部</button>
+                        <button class="filter-button" data-filter="AI项目">AI项目</button>
+                        <button class="filter-button" data-filter="图片项目">图片</button>
+                        <button class="filter-button" data-filter="小游戏">小游戏</button>
+                        <button class="filter-button" data-filter="工具">工具</button>
+                        <button class="filter-button" data-filter="演示">演示</button>
+                    </div>
+                </div>
                 <div class="project-grid">
-                    <div class="project-card">
-                        <img src="https://via.placeholder.com/420x140.png?text=项目+1" alt="项目1">
+                    <a class="project-card" href="https://yang-bone.github.io/projects/ai/milk-frog-water/" target="_blank" rel="noopener noreferrer">
+                        <img src="https://github.com/Yang-bone/yang-bone.github.io/blob/main/projects/ai/milk-frog-water/bake.png?raw=true" alt="项目1">
                         <div class="project-body">
                             <div>
                                 <h3>奶娃喝水</h3>
-                                <p>无</p>
+                                <p>一个简单的AI项目,使用了2天天家对话
+                                    快去关注罗太永不破防,在B站搜索"罗太永不破防"就能找到他的主页,他是一个非常有趣的up主,我非常喜欢他的视频,所以我决定做一个AI项目来向他致敬
+                                </p>
                             </div>
-                            <span class="project-tag">AI项目</span>
+                            <div class="project-tags">
+                                <span class="project-tag">AI项目</span>
+                                <span class="project-tag">有趣</span>
+                                <span class="project-tag">HTML5实现</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="project-card">
-                        <img src="https://via.placeholder.com/420x140.png?text=项目+2" alt="项目2">
+                    </a>
+                    <a class="project-card" href="https://example.com/project2" target="_blank" rel="noopener noreferrer" data-title="项目 2" data-categories="小游戏,互动">
+                        <img src="https://via.placeholder.com/420x240.png?text=项目+2" alt="项目2">
                         <div class="project-body">
                             <div>
                                 <h3>项目 2</h3>
                                 <p>无</p>
                             </div>
-                            <span class="project-tag">小游戏</span>
+                            <div class="project-tags">
+                                <span class="project-tag">小游戏</span>
+                                <span class="project-tag">互动</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="project-card">
-                        <img src="https://via.placeholder.com/420x140.png?text=项目+3" alt="项目3">
+                    </a>
+                    <a class="project-card" href="https://example.com/project3" target="_blank" rel="noopener noreferrer" data-title="项目 3" data-categories="工具,实用">
+                        <img src="https://via.placeholder.com/420x240.png?text=项目+3" alt="项目3">
                         <div class="project-body">
                             <div>
                                 <h3>项目 3</h3>
                                 <p>无</p>
                             </div>
-                            <span class="project-tag">工具</span>
+                            <div class="project-tags">
+                                <span class="project-tag">工具</span>
+                                <span class="project-tag">实用</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="project-card">
-                        <img src="https://via.placeholder.com/420x140.png?text=项目+4" alt="项目4">
+                    </a>
+                    <a class="project-card" href="https://example.com/project4" target="_blank" rel="noopener noreferrer" data-title="项目 4" data-categories="演示,效果">
+                        <img src="https://via.placeholder.com/420x240.png?text=项目+4" alt="项目4">
                         <div class="project-body">
                             <div>
                                 <h3>项目 4</h3>
                                 <p>无</p>
                             </div>
-                            <span class="project-tag">演示</span>
+                            <div class="project-tags">
+                                <span class="project-tag">演示</span>
+                                <span class="project-tag">效果</span>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
