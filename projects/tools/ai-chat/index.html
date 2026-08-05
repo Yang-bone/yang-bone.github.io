@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的 AI 论坛助手 (终极版)</title>
+    <style>
+        /* --- 基础设置 --- */
+        :root {
+            --bg-color: #1a1b26;
+            --sidebar-bg: #16161e;
+            --chat-bg: #1a1b26;
+            --input-bg: #292e42;
+            --text-color: #c0caf5;
+            --accent-color: #7aa2f7;
+            --user-msg-bg: #3d59a1;
+            --ai-msg-bg: #292e42;
+            --border-color: #292e42;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        /* --- 侧边栏 --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .new-chat-btn {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .new-chat-btn:hover {
+            background-color: #3b4261;
+            border-color: var(--accent-color);
+        }
+        .history-list {
+            margin-top: 20px;
+            flex: 1;
+            overflow-y: auto;
+            color: #565f89;
+            font-size: 14px;
+        }
+        /* --- 主聊天区域 --- */
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .chat-container {
+            flex: 1;
+            padding: 20px 10%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+        }
+        /* --- 消息气泡样式 & 动画 --- */
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.6;
+            font-size: 15px;
+            position: relative;
+            word-wrap: break-word;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes popIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message.user {
+            align-self: flex-end;
+            background-color: var(--user-msg-bg);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+        .message.ai {
+            align-self: flex-start;
+            background-color: var(--ai-msg-bg);
+            color: var(--text-color);
+            border-bottom-left-radius: 2px;
+        }
+        .message strong {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            opacity: 0.7;
+        }
+        /* --- 底部输入区 --- */
+        .input-area {
+            padding: 20px 10%;
+            background-color: var(--bg-color);
+        }
+        .input-wrapper {
+            position: relative;
+            background-color: var(--input-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: border-color 0.3s;
+            display: flex;
+            align-items: flex-end;
+            padding: 5px;
+        }
+        .input-wrapper:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(122, 162, 247, 0.2);
+        }
+        textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            max-height: 200px;
+            min-height: 24px;
+            font-family: inherit;
+        }
+        button#send-btn {
+            background-color: var(--accent-color);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            margin: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        button#send-btn:hover {
+            transform: scale(1.05);
+            background-color: #8db0ff;
+        }
+        button#send-btn:disabled {
+            background-color: #414868;
+            cursor: not-allowed;
+            transform: none;
+        }
+        button#send-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: #1a1b26;
+        }
+        /* --- 模型选择器样式 --- */
+        .model-selector-container {
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #565f89;
+            z-index: 10;
+        }
+        select#model-select {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 1px solid transparent;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-left: 5px;
+            cursor: pointer;
+            outline: none;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        select#model-select:hover {
+            background-color: rgba(122, 162, 247, 0.1);
+            border-color: rgba(122, 162, 247, 0.3);
+        }
+        select#model-select option {
+            background-color: var(--sidebar-bg);
+            color: var(--text-color);
+        }
+        /* --- 加载/思考动画 --- */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 0;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background-color: #7aa2f7;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #292e42; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b4261; }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="logo">🤖 AI 中文版</div>
+        <button class="new-chat-btn" onclick="location.reload()">
+            <span>+</span> 新对话
+        </button>
+        <div class="history-list">
+            <div style="padding: 10px 0;">暂无历史数据</div>
+        </div>
+        <!-- 模型选择器放在侧边栏底部 -->
+        <div class="model-selector-container">
+            <label for="model-select">模型:</label>
+            <select id="model-select">
+                <option value="inclusionai/ling-3.0-flash:free">Ling 3.0 Flash (通用)</option>
+                <option value="poolside/laguna-s-2.1:free">Laguna S 2.1 (代码)</option>
+                <option value="poolside/laguna-xs-2.1:free">Laguna XS 2.1 (轻量)</option>
+                <option value="cohere/north-mini-code:free">Cohere North Mini (代码)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 主界面 -->
+    <div class="main-chat">
+        <div class="chat-container" id="chat-container">
+            <!-- 欢迎语 -->
+            <div class="message ai">
+                <strong>AI 助手</strong>
+                你好！我是你的 AI 论坛助手。我已经准备好了，请问有什么可以帮你？
+            </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea id="user-input" placeholder="给 AI 发送消息... (Shift+Enter 换行)" rows="1"></textarea>
+                <button id="send-btn">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 配置区 ---
+        // API 地址已改为指向我们自己的后端
+        const API_URL = "/api/chat";
+
+        // --- DOM 元素 ---
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const modelSelect = document.getElementById('model-select');
+
+        // --- 自动调整输入框高度 ---
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            if(this.value === '') this.style.height = 'auto';
+        });
+
+        // --- 发送消息逻辑 ---
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // 1. 获取当前选中的模型
+            const currentModel = modelSelect.value;
+            console.log(`正在使用模型: ${currentModel}`);
+
+            // 2. 显示用户消息
+            appendMessage('user', text);
+            userInput.value = '';
+            userInput.style.height = 'auto';
+
+            // 禁用按钮防止重复发送
+            setLoading(true);
+
+            // 3. 创建 AI 消息占位符（用于流式输出）
+            const aiMessageDiv = appendMessage('ai', '');
+            const contentDiv = aiMessageDiv.querySelector('.content');
+
+            // 添加“思考中”动画
+            contentDiv.innerHTML = '<div class="typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: currentModel,
+                        messages: [
+                            { role: "system", content: "你是一个有用的 AI 助手。" },
+                            { role: "user", content: text }
+                        ],
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error?.message || `API 请求失败: ${response.status}`);
+                }
+
+                // 4. 处理流式响应
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let accumulatedText = "";
+
+                // 清除“思考中”动画
+                contentDiv.innerHTML = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                const content = data.choices?.[0]?.delta?.content || "";
+                                if (content) {
+                                    accumulatedText += content;
+                                    // 实时更新内容
+                                    contentDiv.textContent = accumulatedText;
+                                    // 保持滚动到底部
+                                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                                }
+                            } catch (e) {
+                                console.warn("解析 JSON 块失败", e);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                contentDiv.innerHTML = `<span style="color: #ff757f;">❌ 错误: ${error.message}</span>`;
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // --- 辅助函数：添加消息到界面 ---
+        function appendMessage(role, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${role}`;
+            const contentHtml = role === 'ai' ? `<strong>AI 助手</strong><div class="content">${text}</div>` : `<strong>我</strong><div class="content">${text}</div>`;
+            msgDiv.innerHTML = contentHtml;
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return msgDiv;
+        }
+
+        // --- 辅助函数：设置加载状态 ---
+        function setLoading(isLoading) {
+            sendBtn.disabled = isLoading;
+            userInput.disabled = isLoading;
+            if (!isLoading) userInput.focus();
+        }
+
+        // --- 事件监听 ---
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
