@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>倒计时工具</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background:
+    radial-gradient(ellipse at 10% 30%, #a78bfa 0%, transparent 45%),
+    radial-gradient(ellipse at 90% 10%, #f472b6 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 80%, #38bdf8 0%, transparent 45%),
+    radial-gradient(ellipse at 20% 80%, #34d399 0%, transparent 40%),
+    radial-gradient(ellipse at 55% 50%, #fb923c 0%, transparent 40%),
+    linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #1e3a5f 60%, #0f172a 100%);
+  background-attachment: fixed;
+}
+
+/* ── Liquid Glass 容器 ── */
+.container {
+  position: relative;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(60px) saturate(220%) brightness(1.08);
+  -webkit-backdrop-filter: blur(60px) saturate(220%) brightness(1.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 28px;
+  padding: 44px 48px;
+  text-align: center;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+/* 頂部高光條 */
+.container::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(255,255,255,0.7) 30%,
+    rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.7) 70%, transparent 100%
+  );
+  z-index: 2;
+}
+
+/* 左上角光澤 */
+.container::after {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 55%;
+  background: linear-gradient(175deg,
+    rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.04) 50%, transparent 100%
+  );
+  pointer-events: none; z-index: 1; border-radius: 28px;
+}
+
+.icon { font-size: 48px; margin-bottom: 14px; position: relative; z-index: 3; }
+
+h1 { color: white; margin-bottom: 8px; font-size: 1.6rem; font-weight: 700; position: relative; z-index: 3; }
+
+p { color: rgba(255,255,255,0.65); margin-bottom: 24px; position: relative; z-index: 3; }
+
+/* ── 時間輸入框 ── */
+.time-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  position: relative; z-index: 3;
+}
+
+.time-inputs input {
+  width: 88px;
+  padding: 14px 8px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 14px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: background 0.2s, border-color 0.2s;
+  outline: none;
+}
+
+.time-inputs input::placeholder { color: rgba(255,255,255,0.35); }
+
+.time-inputs input:focus {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.45);
+}
+
+/* 標籤 */
+.time-labels {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: -20px;
+  margin-bottom: 24px;
+  position: relative; z-index: 3;
+}
+.time-labels span {
+  width: 88px;
+  text-align: center;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
+}
+
+/* ── 按鈕群 ── */
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: relative; z-index: 3;
+}
+
+button {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.10);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.28);
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 4px 16px rgba(0,0,0,0.3);
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 靜態頂部高光 */
+button::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+  border-radius: inherit; pointer-events: none; z-index: 1;
+}
+
+/* 掃光層 */
+button::after {
+  content: '';
+  position: absolute;
+  top: -20%; left: -80%;
+  width: 60%; height: 140%;
+  background: linear-gradient(105deg,
+    transparent 30%, rgba(255,255,255,0.28) 50%, transparent 70%
+  );
+  transform: skewX(-15deg);
+  transition: left 0.45s ease;
+  pointer-events: none; z-index: 2;
+}
+
+button:hover::after { left: 130%; }
+
+button:hover {
+  background: rgba(255,255,255,0.18) !important;
+  transform: scale(1.06) translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 8px 28px rgba(0,0,0,0.4);
+}
+
+button:active {
+  transform: scale(0.96) translateY(1px) !important;
+  background: rgba(255,255,255,0.22) !important;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3) !important;
+  transition: all 0.08s ease !important;
+}
+
+/* ── 倒數計時 ── */
+.countdown-box {
+  margin-top: 32px;
+  position: relative; z-index: 3;
+}
+
+.countdown-number {
+  font-size: 56px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 2px;
+  text-shadow: 0 0 40px rgba(167,139,250,0.6), 0 2px 8px rgba(0,0,0,0.4);
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-text {
+  color: rgba(255,255,255,0.5);
+  margin-top: 6px;
+  font-size: 0.88rem;
+}
+
+/* 返回連結 */
+.back-link {
+  display: inline-block;
+  margin-top: 24px;
+  color: rgba(255,255,255,0.45);
+  text-decoration: none;
+  font-size: 0.85rem;
+  position: relative; z-index: 3;
+  transition: color 0.2s;
+}
+.back-link:hover { color: rgba(255,255,255,0.8); }
+</style>
+</head>
+
+<body>
+
+<!-- SVG 折射濾鏡 -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glass-refract">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018 0.025" numOctaves="2" seed="3" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<div class="container">
+  <div class="icon">⏱️</div>
+  <h1>倒计时工具</h1>
+  <p>输入时间后点击开始</p>
+
+  <div class="time-inputs">
+    <input type="number" id="hoursInput" placeholder="0" min="0">
+    <input type="number" id="minutesInput" placeholder="0" min="0" max="59">
+    <input type="number" id="secondsInput" placeholder="0" min="0" max="59">
+  </div>
+  <div class="time-labels">
+    <span>时</span><span>分</span><span>秒</span>
+  </div>
+
+  <div class="buttons">
+    <button onclick="startTimer()">▶ 开始</button>
+    <button id="pauseBtn" onclick="pauseTimer()">⏸ 暂停</button>
+    <button onclick="resetTimer()">↺ 重设</button>
+  </div>
+
+  <div class="countdown-box">
+    <div class="countdown-number" id="countdown">00:00:00</div>
+    <div class="countdown-text">剩余时间</div>
+  </div>
+
+  <a href="https://yang-bone.de5.net/projects" class="back-link">← 回到个人网站</a>
+</div>
+
+<script>
+let totalSeconds = 0;
+let timer = null;
+let isPaused = false;
+
+function updateDisplay() {
+  let h = Math.floor(totalSeconds / 3600);
+  let m = Math.floor((totalSeconds % 3600) / 60);
+  let s = totalSeconds % 60;
+  document.getElementById("countdown").innerText =
+    String(h).padStart(2,"0") + ":" +
+    String(m).padStart(2,"0") + ":" +
+    String(s).padStart(2,"0");
+}
+
+function countdown() {
+  totalSeconds--;
+  updateDisplay();
+  if (totalSeconds <= 0) {
+    clearInterval(timer);
+    totalSeconds = 0;
+    updateDisplay();
+    const sound = new Audio("sound.wav");
+    sound.play();
+    sound.onended = function() {
+      setTimeout(() => { window.location.href = "time_end.html"; }, 1000);
+    };
+  }
+}
+
+function startTimer() {
+  if (isPaused && totalSeconds > 0) {
+    isPaused = false;
+    timer = setInterval(countdown, 1000);
+    return;
+  }
+  let h = parseInt(document.getElementById("hoursInput").value) || 0;
+  let m = parseInt(document.getElementById("minutesInput").value) || 0;
+  let s = parseInt(document.getElementById("secondsInput").value) || 0;
+  totalSeconds = h * 3600 + m * 60 + s;
+  if (totalSeconds <= 0) { alert("请输入时间！"); return; }
+  clearInterval(timer);
+  isPaused = false;
+  updateDisplay();
+  timer = setInterval(countdown, 1000);
+}
+
+function pauseTimer() {
+  if (timer !== null) {
+    clearInterval(timer);
+    timer = null;
+    isPaused = true;
+  }
+}
+
+function resetTimer() {
+  clearInterval(timer);
+  timer = null;
+  totalSeconds = 0;
+  isPaused = false;
+  document.getElementById("hoursInput").value = "";
+  document.getElementById("minutesInput").value = "";
+  document.getElementById("secondsInput").value = "";
+  document.getElementById("countdown").innerText = "00:00:00";
+}
+</script>
+</body>
+</html>
