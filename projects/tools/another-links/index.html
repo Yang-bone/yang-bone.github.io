@@ -1,1 +1,178 @@
 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://raw.githubusercontent.com/Yang-bone/yang-bone.github.io/main/tou.png" type="image/png">
+    <title>我的友情链接</title>
+    <style>
+        /* --- 1. 基础设置与网格背景 --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #0f1015;
+            /* 绘制极细的网格线 */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden; /* 防止X轴移动时出现滚动条 */
+        }
+      
+        #returnLink {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 20;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.55rem 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #111;
+            text-decoration: none;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+            font-family: 'Adofai 2', sans-serif;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+      
+        #returnLink:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        /* --- 2. 炫彩标题 --- */
+        .page-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 60px;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%); /* 青色渐变 */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 201, 255, 0.3);
+        }
+      
+
+        /* --- 3. 卡片容器 --- */
+        .card-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        /* --- 4. 卡片主体样式 --- */
+        .card {
+            width: 220px;
+            height: 280px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            
+            /* 【关键修改】这里设置过渡效果，让变化平滑 */
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* 初始状态：稍微透明一点，位置居中 */
+            opacity: 0.7; 
+            transform: translateX(0);
+        }
+
+        /* 文字内容层级锁定，防止被遮挡 */
+        .card-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: #fff;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- 5. 悬停交互逻辑 (核心修改部分) --- */
+        
+        .card:hover {
+            /* 
+               1. X轴移动：向右移动 10px (你可以改成负数向左)
+               2. 不再包含 Y轴移动 
+            */
+            transform: translateX(10px); 
+            
+            /* 透明度锁定：直接变为 1 (完全不透明) */
+            opacity: 1; 
+            
+            /* 边框发光 */
+            border-color: rgba(0, 201, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 201, 255, 0.15);
+            
+            /* 背景稍微变亮 */
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* 可选：给文字加一点点颜色变化 */
+        .card:hover h3 {
+            color: #00C9FF;
+        }
+
+        /* --- 6. 入场动画 (仅加载时播放一次) --- */
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 0.7; transform: translateX(0); } /* 注意这里要回到初始的透明度 */
+        }
+
+        .card {
+            animation: slideInLeft 0.8s ease-out forwards;
+        }
+        
+        /* 让卡片依次入场 */
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+
+    </style>
+</head>
+<body>
+    <a id="returnLink" href="https://yang-bone.github.io/projects">返回</a>
+    <h1 class="page-title">MY LINKS</h1>
+
+    <!-- 修复：卡片放在 card-container 容器内 -->
+    <div class="card-container">
+        <!-- 修复：卡片内容用 card-content 包裹 -->
+        <a href="https://noname-tt.cc.cd" target="_blank" class="card">
+            <div class="card-content">
+                <h3>没有名字的tt</h3>
+                <p>一个喜爱Undertale和Deltarune的人</p>
+            </div>
+        </a>
+      
+    </div>
+
+</body>
+</html>
