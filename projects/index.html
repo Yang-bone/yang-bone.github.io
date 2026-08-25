@@ -8,8 +8,8 @@
         <script type="module" src="index.js"></script>
         <style>
             @font-face {
-                font-family: 'Adofai 2';
-                src: url('project/adofai 2.ttf') format('truetype');
+                font-family: 'Adofai2';
+                src: url('Aacute.ttf') format('truetype');
             }
             html, body {
                 width: 100%;
@@ -26,7 +26,7 @@
                 background-attachment: fixed;
                 min-height: 100vh;
                 height: 100vh;
-                font-family: 'Adofai 2', sans-serif;
+                font-family: 'Adofai2', sans-serif;
                 padding: 2rem;
                 box-sizing: border-box;
                 display: flex;
@@ -51,7 +51,7 @@
                 color: #111;
                 text-decoration: none;
                 box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
-                font-family: 'Adofai 2', sans-serif;
+                font-family: 'Adofai2', sans-serif;
                 transition: transform 0.2s ease, background 0.2s ease;
             }
             #returnLink:hover {
@@ -74,7 +74,7 @@
                 padding: 1rem 1.5rem;
                 color: #000000;
                 font-size: 3rem;
-                font-family: 'Adofai 2', sans-serif;
+                font-family: 'Adofai2', sans-serif;
                 background: rgba(255, 255, 255, 0.18);
                 border: 1px solid rgba(255, 255, 255, 0.4);
                 border-radius: 28px;
@@ -91,6 +91,12 @@
                 animation: none;
                 transform: translateY(-180%);
                 opacity: 0;
+            }
+            p[id="LastUpdateDay"] {
+                margin: 0.5rem 0 0;
+                color: #000000;
+                font-size: 1.1rem;
+                font-family: 'Adofai2', sans-serif;
             }
             #menu {
                 position: fixed;
@@ -137,6 +143,7 @@
                 margin: 0;
                 font-size: 2rem;
                 line-height: 1.2;
+                font-family: 'Adofai2', sans-serif;
             }
             .menu-toggle {
                 border: none;
@@ -146,6 +153,8 @@
                 padding: 0.5rem 0.9rem;
                 cursor: pointer;
                 font-size: 0.95rem;
+                font-family: 'Adofai2', sans-serif;
+                transition: transform 0.2s ease, background 0.2s ease;
             }
             .project-controls {
                 display: flex;
@@ -165,6 +174,7 @@
                 color: #111;
                 outline: none;
                 box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+                font-family: 'Adofai2', sans-serif;
             }
             .project-search::placeholder {
                 color: rgba(0,0,0,0.4);
@@ -191,12 +201,12 @@
                 opacity: 1;
                 transform: translateY(-1px);
             }
-            .filter-button[data-filter="AI项目"] { background: #8b5cf6; }
-            .filter-button[data-filter="图片项目"] { background: #f59e0b; }
-            .filter-button[data-filter="小游戏"] { background: #10b981; }
-            .filter-button[data-filter="工具"] { background: #3b82f6; }
-            .filter-button[data-filter="演示"] { background: #ef4444; }
-            .filter-button[data-filter="all"] { background: #6b7280; }
+            .filter-button[data-filter="AI项目"] { background: #8b5cf6; font-family: 'Adofai2', sans-serif; }
+            .filter-button[data-filter="图片项目"] { background: #f59e0b; font-family: 'Adofai2', sans-serif; }
+            .filter-button[data-filter="小游戏"] { background: #10b981; font-family: 'Adofai2', sans-serif; }
+            .filter-button[data-filter="工具"] { background: #3b82f6; font-family: 'Adofai2', sans-serif; }
+            .filter-button[data-filter="演示"] { background: #ef4444; font-family: 'Adofai2', sans-serif; }
+            .filter-button[data-filter="all"] { background: #6b7280; font-family: 'Adofai2', sans-serif; }
             .project-grid {
                 display: grid;
                 gap: 1rem;
@@ -263,12 +273,14 @@
             .project-card h3 {
                 margin: 0 0 0.5rem;
                 font-size: 1.15rem;
+                font-family: 'Adofai2', sans-serif;
             }
             .project-card p {
                 margin: 0;
                 color: rgba(0, 0, 0, 0.72);
                 font-size: 0.95rem;
                 line-height: 1.4;
+                font-family: 'Adofai2', sans-serif;
             }
             .project-card .project-tag {
                 margin-top: 1rem;
@@ -295,6 +307,8 @@
             <div id="menu">
                 <div class="menu-header">
                     <h2>我的项目</h2>
+                    <p id="LastUpdateDay">最后更新日期: 2026年8月25日</p>
+                    <strong>（点击项目卡片即可访问）</strong>
                     <button class="menu-toggle" type="button">收起</button>
                 </div>
                 <div class="project-controls">
