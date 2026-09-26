@@ -1,291 +1,1105 @@
 <!DOCTYPE html>
 <html lang="zh">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="https://raw.githubusercontent.com/Yang-bone/yang-bone.github.io/main/tou.png" type="image/png">
-        <title>Yang_bone</title>
-        <style>
-            *,:before,:after{box-sizing:border-box!important}html{color-scheme:dark;accent-color:var(--primary-base)}html,body{margin:0}html[data-theme=light]{color-scheme:light}body{-webkit-font-smoothing:antialiased;color:var(--text-normal);background-color:var(--background-base)}input,button,textarea,select{font:inherit}p,h1,h2,h3,h4,h5,h6,code{overflow-wrap:anywhere}code{font-family:monospace}button{background:0 0;border:none;outline:none;padding:0}[data-theme=light],[data-theme=light] *{color-scheme:light}[data-theme=dark],[data-theme=dark] *{color-scheme:dark}:root{--background-base:#0f0f0f;--background-step-1:#141414;--background-step-2:#171717;--background-step-3:#1f1f1f;--background-gray:gray;--text-normal:#fff;--text-dimmed:#fffc;--text-muted:#ffffffbf;--text-inverted:#000;--text-inverted-dimmed:#000000b3;--text-inverted-muted:#000000a6;--border:#29292e;--shadow:#0009;--default-base:#1f1f1f;--default-hover:#2b2b2b;--default-active:#242424;--primary-base:#a589e1;--primary-hover:#bca3ef;--primary-active:#aa8bee;--primary-vibrant:#aa8bee;--success-base:#24c660;--success-hover:#50dc84;--success-active:#2ced73;--warning-base:#f6cc23;--warning-hover:#fbda56;--warning-active:#f8d030;--danger-base:#6b0529;--danger-hover:#830736;--danger-active:#790632;--danger-vibrant:#cd0a4e;--info-base:#02316e;--info-hover:#053a7f;--info-active:#043677;--info-vibrant:#146fe6;--mono-base:#fff;--mono-hover:#e6e6e6;--mono-active:#f2f2f2;--text-light:#fff;--text-dark:#000;--default-flat:#24242480;--default-flat-hover:#242424d9;--default-flat-active:#242424bf;--primary-flat:#a581f31a;--primary-flat-hover:#a581f359;--primary-flat-active:#a581f340;--success-flat:#22c95f1a;--success-flat-hover:#22c95f59;--success-flat-active:#22c95f40;--warning-flat:#facc141a;--warning-flat-hover:#facc1459;--warning-flat-active:#facc1440;--danger-flat:#9c02381a;--danger-flat-hover:#9c023859;--danger-flat-active:#9c023840;--info-flat:#146af51a;--info-flat-hover:#146af559;--info-flat-active:#146af540;--mono-flat:#b3b3b31a;--mono-flat-hover:#b3b3b359;--mono-flat-active:#b3b3b340}[data-theme=light]{--background-base:#f7f7f7;--background-step-1:#f2f2f2;--background-step-2:#ebebeb;--background-step-3:#e3e3e3;--background-gray:gray;--text-normal:#000;--text-dimmed:#000c;--text-muted:#000000bf;--text-inverted:#fff;--text-inverted-dimmed:#ffffffd9;--text-inverted-muted:#ffffffbf;--border:#aca9b1;--shadow:#a6a6a699;--default-base:#d1d1d1;--default-hover:#e8e8e8;--default-active:#dbdbdb;--primary-base:#2e116f;--primary-hover:#40159d;--primary-active:#3b1490;--primary-vibrant:#531dc9;--success-base:#2db45e;--success-hover:#47d17a;--success-active:#33cc6b;--warning-base:#c5a111;--warning-hover:#e7bd13;--warning-active:#d5ae10;--danger-base:#4a031c;--danger-hover:#69072d;--danger-active:#5c0526;--danger-vibrant:#b40e48;--info-base:#02316e;--info-hover:#053a7f;--info-active:#043677;--info-vibrant:#0c58bb;--mono-base:#1a1a1a;--mono-hover:#292929;--mono-active:#242424;--default-flat:#b3b3b380;--default-flat-hover:#b3b3b3d9;--default-flat-active:#b3b3b3bf}:root{--radius-sm:.25rem;--radius-md:.5rem;--radius-lg:.75rem;--radius-full:999px}.sui-user-container{flex-direction:row;align-items:center;gap:1rem;display:flex}.sui-avatar-container{background-color:var(--default-base);border-radius:var(--radius-full);border:1px solid var(--border);justify-content:center;align-items:center;width:2.5rem;height:2.5rem;display:flex;overflow:hidden}.sui-avatar-img{width:100%;height:auto}.sui-text-content{flex-direction:column;gap:.125rem;display:flex}.sui-name{font-size:1em;font-weight:600}.sui-description{color:var(--text-muted);font-size:.875em;font-weight:400}.footer-content[data-astro-cid-6754zdfc]{color:var(--text-muted);flex-direction:column;gap:8px;display:flex}.footer-top[data-astro-cid-6754zdfc]{justify-content:space-between;align-items:center;display:flex}.footer-bottom[data-astro-cid-6754zdfc]{text-align:center;font-size:12px}.time-card[data-astro-cid-qdxkhx7a]{justify-content:center;align-items:center;gap:8px;width:100%;padding:10px 16px;font-size:14px;display:flex}.time-icon[data-astro-cid-qdxkhx7a]{font-size:14px}.time-text[data-astro-cid-qdxkhx7a]{font-variant-numeric:tabular-nums;color:var(--text-primary);font-weight:600}.hitokoto-card[data-astro-cid-4ynrdyaf]{justify-content:space-between;align-items:center;gap:12px;width:100%;padding:16px 20px;display:flex}.hitokoto-content[data-astro-cid-4ynrdyaf]{flex-direction:column;flex:1;gap:4px;min-width:0;display:flex}.hitokoto-text[data-astro-cid-4ynrdyaf]{color:var(--text-primary);word-break:break-word;font-size:14px;line-height:1.5}.hitokoto-from[data-astro-cid-4ynrdyaf]{color:var(--text-muted);text-align:right;font-size:12px}.hitokoto-actions[data-astro-cid-4ynrdyaf]{flex-shrink:0;gap:8px;display:flex}.action-btn[data-astro-cid-4ynrdyaf]{border:1px solid var(--border-color);background:var(--btn-bg);width:36px;height:36px;color:var(--text-primary);cursor:pointer;border-radius:10px;justify-content:center;align-items:center;transition:all .3s;display:flex}.action-btn[data-astro-cid-4ynrdyaf]:hover{background:#80808040;transform:translateY(-2px)}.action-btn[data-astro-cid-4ynrdyaf].copied{background:#4caf504d;border-color:#4caf50}.action-btn[data-astro-cid-4ynrdyaf].loading svg[data-astro-cid-4ynrdyaf]{animation:1s linear infinite spin}@keyframes spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.readme-card[data-astro-cid-vya2hfqh]{width:100%;padding:20px}.readme-header[data-astro-cid-vya2hfqh]{cursor:pointer;user-select:none;justify-content:space-between;align-items:center;margin-bottom:16px;display:flex}.readme-header[data-astro-cid-vya2hfqh]:hover .toggle-btn[data-astro-cid-vya2hfqh]{opacity:.8}.readme-title[data-astro-cid-vya2hfqh]{color:var(--text-primary);flex:1;margin:0;font-size:16px}.toggle-btn[data-astro-cid-vya2hfqh]{color:var(--text-secondary);cursor:pointer;opacity:.6;background:0 0;border:none;border-radius:6px;justify-content:center;align-items:center;padding:4px 8px;transition:all .3s;display:flex}.toggle-btn[data-astro-cid-vya2hfqh]:hover{background:var(--btn-bg);opacity:1}.toggle-btn[data-astro-cid-vya2hfqh]:focus-visible{outline:2px solid var(--text-primary);outline-offset:2px}.toggle-icon[data-astro-cid-vya2hfqh]{transition:transform .3s}.toggle-icon[data-astro-cid-vya2hfqh].collapsed{transform:rotate(-90deg)}.readme-content-wrapper[data-astro-cid-vya2hfqh]{opacity:1;max-height:600px;transition:max-height .4s,opacity .3s;overflow:hidden}.readme-content-wrapper[data-astro-cid-vya2hfqh].collapsed{opacity:0;margin-top:0;padding-top:0;max-height:0!important}.readme-content[data-astro-cid-vya2hfqh]{color:var(--text-secondary);max-height:500px;padding-top:4px;padding-right:8px;font-size:14px;line-height:1.7;overflow-y:auto}.readme-content[data-astro-cid-vya2hfqh] h1{color:var(--text-primary);border-bottom:1px solid var(--border-color);margin:20px 0 10px;padding-bottom:8px;font-size:1.5em;font-weight:700}.readme-content[data-astro-cid-vya2hfqh] h2{color:var(--text-primary);margin:18px 0 8px;font-size:1.3em;font-weight:600}.readme-content[data-astro-cid-vya2hfqh] h3{color:var(--text-primary);margin:14px 0 6px;font-size:1.15em;font-weight:600}.readme-content[data-astro-cid-vya2hfqh] h4{color:var(--text-primary);margin:12px 0 6px;font-size:1em;font-weight:600}.readme-content[data-astro-cid-vya2hfqh] h5,.readme-content[data-astro-cid-vya2hfqh] h6{color:var(--text-primary);margin:10px 0 4px;font-size:.9em;font-weight:600}.readme-content[data-astro-cid-vya2hfqh] p{color:var(--text-secondary);margin:8px 0}.readme-content[data-astro-cid-vya2hfqh] a{color:#58a6ff;text-decoration:none;transition:color .2s}.readme-content[data-astro-cid-vya2hfqh] a:hover{color:#79c0ff;text-decoration:underline}.readme-content[data-astro-cid-vya2hfqh] strong{color:var(--text-primary);font-weight:700}.readme-content[data-astro-cid-vya2hfqh] em{color:var(--text-secondary);font-style:italic}.readme-content[data-astro-cid-vya2hfqh] del{color:var(--text-muted)}.readme-content[data-astro-cid-vya2hfqh] code{background:var(--btn-bg);color:#f0883e;border-radius:4px;padding:2px 6px;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;font-size:.88em}.readme-content[data-astro-cid-vya2hfqh] pre{background:var(--bg-card-inner);border:1px solid var(--border-color);border-radius:8px;margin:10px 0;padding:14px;overflow-x:auto}.readme-content[data-astro-cid-vya2hfqh] pre code{color:var(--text-primary);background:0 0;padding:0;font-size:.85em}.readme-content[data-astro-cid-vya2hfqh] ul,.readme-content[data-astro-cid-vya2hfqh] ol{margin:8px 0;padding-left:24px}.readme-content[data-astro-cid-vya2hfqh] li{color:var(--text-secondary);margin:4px 0}.readme-content[data-astro-cid-vya2hfqh] li input[type=checkbox]{margin-right:6px}.readme-content[data-astro-cid-vya2hfqh] blockquote{border-left:3px solid var(--border-color);color:var(--text-muted);background:var(--btn-bg);border-radius:0 6px 6px 0;margin:10px 0;padding:4px 12px}.readme-content[data-astro-cid-vya2hfqh] blockquote p{margin:4px 0}.readme-content[data-astro-cid-vya2hfqh] table{border-collapse:collapse;width:100%;margin:12px 0;display:block;overflow-x:auto}.readme-content[data-astro-cid-vya2hfqh] th,.readme-content[data-astro-cid-vya2hfqh] td{border:1px solid var(--border-color);text-align:left;padding:8px 12px}.readme-content[data-astro-cid-vya2hfqh] th{background:var(--btn-bg);color:var(--text-primary);font-weight:600}.readme-content[data-astro-cid-vya2hfqh] td{color:var(--text-secondary)}.readme-content[data-astro-cid-vya2hfqh] img{border-radius:8px;max-width:100%;margin:8px 0}.readme-content[data-astro-cid-vya2hfqh] hr{border:none;border-top:1px solid var(--border-color);margin:16px 0}.readme-content[data-astro-cid-vya2hfqh]::-webkit-scrollbar{width:6px;height:6px}.readme-content[data-astro-cid-vya2hfqh]::-webkit-scrollbar-track{background:0 0}.readme-content[data-astro-cid-vya2hfqh]::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:3px}.readme-content[data-astro-cid-vya2hfqh]::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}@font-face{font-family:AaCute;src:url(/new/AaCute.ttf)format("truetype");font-weight:400;font-style:normal;font-display:swap}*{box-sizing:border-box;margin:0;padding:0}html,body{min-height:100vh;font-family:AaCute,-apple-system,BlinkMacSystemFont,sans-serif;transition:background-color .3s,color .3s}:root{--bg-primary:#1a1a1a;--bg-card:#141414a6;--bg-card-inner:#28282880;--text-primary:#fff;--text-secondary:#ccc;--text-muted:#888;--border-color:#ffffff1a;--overlay-color:#00000026;--btn-bg:#ffffff1a;--btn-text:#fff}:root.light{--bg-primary:#f0f0f0;--bg-card:#ffffffd9;--bg-card-inner:#e6e6e6cc;--text-primary:#1a1a1a;--text-secondary:#444;--text-muted:#777;--border-color:#0000001a;--overlay-color:#ffffff4d;--btn-bg:#00000014;--btn-text:#1a1a1a}body{background:var(--bg-primary);color:var(--text-primary);justify-content:center;align-items:center;padding:20px;display:flex}.background-image{z-index:0;background-image:url(https://api.yppp.net/api.php);background-position:50%;background-repeat:no-repeat;background-size:cover;width:100%;height:100%;position:fixed;top:0;left:0}.background-overlay{background:var(--overlay-color);z-index:1;width:100%;height:100%;position:fixed;top:0;left:0}.container{z-index:2;width:100%;max-width:730px;position:relative}.theme-toggle{z-index:100;cursor:pointer;background:var(--bg-card);-webkit-backdrop-filter:blur(12px);border:none;border:1px solid var(--border-color);border-radius:50%;justify-content:center;align-items:center;width:50px;height:50px;font-size:20px;transition:all .3s;display:flex;position:fixed;top:20px;right:20px;box-shadow:0 4px 15px #0000001a}.theme-toggle:hover{transform:scale(1.1);box-shadow:0 6px 20px #00000026}.theme-toggle .icon-sun{display:none}.theme-toggle .icon-moon,:root.light .theme-toggle .icon-sun{display:block}:root.light .theme-toggle .icon-moon{display:none}.glass-card{transition:all .3s;background:var(--bg-card)!important;-webkit-backdrop-filter:blur(12px)!important;border:1px solid var(--border-color)!important;border-radius:16px!important}.glass-card,.glass-card *,.glass-card h4,.glass-card h5{color:var(--text-primary)!important}.glass-card p{color:var(--text-secondary)!important}.glass-card del{color:var(--text-muted)!important}.glass-card a{color:var(--text-primary)!important}.inner-card{background:var(--bg-card-inner)!important}.skill-badge{background:var(--btn-bg)!important;color:var(--text-primary)!important;border:1px solid var(--border-color)!important}.link-btn{background:var(--btn-bg)!important;color:var(--btn-text)!important;border:1px solid var(--border-color)!important}.link-btn svg{fill:var(--btn-text)!important}.outer-grid{grid-template-columns:1fr 2fr;align-items:start;gap:12px;display:grid}.column-left,.column-right{flex-direction:column;gap:12px;display:flex}@media (width<=768px){.outer-grid{grid-template-columns:1fr}.theme-toggle{width:40px;height:40px;font-size:16px;top:10px;right:10px}}
-        </style>
-        <script type="module" src="/new/_astro/page.sVsxvrj0.js"></script>
-    </head>
-    <body>
-        <div class="background-image"></div>
-        <div class="background-overlay"></div>
-        <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">
-            <span class="icon-sun">☀️</span>
-            <span class="icon-moon">🌙</span>
-        </button>
-        <main class="container">
-            <div class="outer-grid">
-                <div class="column-left">
-                    <div class="glass-card" style="width: 100%; min-height: 80px; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                        <div class="sui-user-container">
-                            <div class="sui-avatar-container">
-                                <img src="https://yang-bone.github.io/new/IMG_202606185314_400x420.png" loading="lazy" alt="Avatar" decoding="async" width="1080" height="1080" class="sui-avatar-img">
-                            </div>
-                            <div class="sui-text-content">
-                                <span class="sui-name">Yang_bone</span>
-                                <span class="sui-description">永远相信美好的事情即将发生</span>
-                            </div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://raw.githubusercontent.com/Yang-bone/yang-bone.github.io/main/tou.png"
+        type="image/png">
+    <title>Yang_bone</title>
+    <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+    <script>LA.init({ id: "3RK1RPuZ7uEyB5GC", ck: "3RK1RPuZ7uEyB5GC", autoTrack: true })</script>
+    <style>
+        *,
+        :before,
+        :after {
+            box-sizing: border-box !important
+        }
+
+        html {
+            color-scheme: dark;
+            accent-color: var(--primary-base)
+        }
+
+        html,
+        body {
+            margin: 0
+        }
+
+        html[data-theme=light] {
+            color-scheme: light
+        }
+
+        body {
+            -webkit-font-smoothing: antialiased;
+            color: var(--text-normal);
+            background-color: var(--background-base)
+        }
+
+        input,
+        button,
+        textarea,
+        select {
+            font: inherit
+        }
+
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        code {
+            overflow-wrap: anywhere
+        }
+
+        code {
+            font-family: monospace
+        }
+
+        button {
+            background: 0 0;
+            border: none;
+            outline: none;
+            padding: 0
+        }
+
+        [data-theme=light],
+        [data-theme=light] * {
+            color-scheme: light
+        }
+
+        [data-theme=dark],
+        [data-theme=dark] * {
+            color-scheme: dark
+        }
+
+        :root {
+            --background-base: #0f0f0f;
+            --background-step-1: #141414;
+            --background-step-2: #171717;
+            --background-step-3: #1f1f1f;
+            --background-gray: gray;
+            --text-normal: #fff;
+            --text-dimmed: #fffc;
+            --text-muted: #ffffffbf;
+            --text-inverted: #000;
+            --text-inverted-dimmed: #000000b3;
+            --text-inverted-muted: #000000a6;
+            --border: #29292e;
+            --shadow: #0009;
+            --default-base: #1f1f1f;
+            --default-hover: #2b2b2b;
+            --default-active: #242424;
+            --primary-base: #a589e1;
+            --primary-hover: #bca3ef;
+            --primary-active: #aa8bee;
+            --primary-vibrant: #aa8bee;
+            --success-base: #24c660;
+            --success-hover: #50dc84;
+            --success-active: #2ced73;
+            --warning-base: #f6cc23;
+            --warning-hover: #fbda56;
+            --warning-active: #f8d030;
+            --danger-base: #6b0529;
+            --danger-hover: #830736;
+            --danger-active: #790632;
+            --danger-vibrant: #cd0a4e;
+            --info-base: #02316e;
+            --info-hover: #053a7f;
+            --info-active: #043677;
+            --info-vibrant: #146fe6;
+            --mono-base: #fff;
+            --mono-hover: #e6e6e6;
+            --mono-active: #f2f2f2;
+            --text-light: #fff;
+            --text-dark: #000;
+            --default-flat: #24242480;
+            --default-flat-hover: #242424d9;
+            --default-flat-active: #242424bf;
+            --primary-flat: #a581f31a;
+            --primary-flat-hover: #a581f359;
+            --primary-flat-active: #a581f340;
+            --success-flat: #22c95f1a;
+            --success-flat-hover: #22c95f59;
+            --success-flat-active: #22c95f40;
+            --warning-flat: #facc141a;
+            --warning-flat-hover: #facc1459;
+            --warning-flat-active: #facc1440;
+            --danger-flat: #9c02381a;
+            --danger-flat-hover: #9c023859;
+            --danger-flat-active: #9c023840;
+            --info-flat: #146af51a;
+            --info-flat-hover: #146af559;
+            --info-flat-active: #146af540;
+            --mono-flat: #b3b3b31a;
+            --mono-flat-hover: #b3b3b359;
+            --mono-flat-active: #b3b3b340
+        }
+
+        [data-theme=light] {
+            --background-base: #f7f7f7;
+            --background-step-1: #f2f2f2;
+            --background-step-2: #ebebeb;
+            --background-step-3: #e3e3e3;
+            --background-gray: gray;
+            --text-normal: #000;
+            --text-dimmed: #000c;
+            --text-muted: #000000bf;
+            --text-inverted: #fff;
+            --text-inverted-dimmed: #ffffffd9;
+            --text-inverted-muted: #ffffffbf;
+            --border: #aca9b1;
+            --shadow: #a6a6a699;
+            --default-base: #d1d1d1;
+            --default-hover: #e8e8e8;
+            --default-active: #dbdbdb;
+            --primary-base: #2e116f;
+            --primary-hover: #40159d;
+            --primary-active: #3b1490;
+            --primary-vibrant: #531dc9;
+            --success-base: #2db45e;
+            --success-hover: #47d17a;
+            --success-active: #33cc6b;
+            --warning-base: #c5a111;
+            --warning-hover: #e7bd13;
+            --warning-active: #d5ae10;
+            --danger-base: #4a031c;
+            --danger-hover: #69072d;
+            --danger-active: #5c0526;
+            --danger-vibrant: #b40e48;
+            --info-base: #02316e;
+            --info-hover: #053a7f;
+            --info-active: #043677;
+            --info-vibrant: #0c58bb;
+            --mono-base: #1a1a1a;
+            --mono-hover: #292929;
+            --mono-active: #242424;
+            --default-flat: #b3b3b380;
+            --default-flat-hover: #b3b3b3d9;
+            --default-flat-active: #b3b3b3bf
+        }
+
+        :root {
+            --radius-sm: .25rem;
+            --radius-md: .5rem;
+            --radius-lg: .75rem;
+            --radius-full: 999px
+        }
+
+        .sui-user-container {
+            flex-direction: row;
+            align-items: center;
+            gap: 1rem;
+            display: flex
+        }
+
+        .sui-avatar-container {
+            background-color: var(--default-base);
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border);
+            justify-content: center;
+            align-items: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            overflow: hidden
+        }
+
+        .sui-avatar-img {
+            width: 100%;
+            height: auto
+        }
+
+        .sui-text-content {
+            flex-direction: column;
+            gap: .125rem;
+            display: flex
+        }
+
+        .sui-name {
+            font-size: 1em;
+            font-weight: 600
+        }
+
+        .sui-description {
+            color: var(--text-muted);
+            font-size: .875em;
+            font-weight: 400
+        }
+
+        .footer-content[data-astro-cid-6754zdfc] {
+            color: var(--text-muted);
+            flex-direction: column;
+            gap: 8px;
+            display: flex
+        }
+
+        .footer-top[data-astro-cid-6754zdfc] {
+            justify-content: space-between;
+            align-items: center;
+            display: flex
+        }
+
+        .footer-bottom[data-astro-cid-6754zdfc] {
+            text-align: center;
+            font-size: 12px
+        }
+
+        .time-card[data-astro-cid-qdxkhx7a] {
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px 16px;
+            font-size: 14px;
+            display: flex
+        }
+
+        .time-icon[data-astro-cid-qdxkhx7a] {
+            font-size: 14px
+        }
+
+        .time-text[data-astro-cid-qdxkhx7a] {
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+            font-weight: 600
+        }
+
+        .hitokoto-card[data-astro-cid-4ynrdyaf] {
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 16px 20px;
+            display: flex
+        }
+
+        .hitokoto-content[data-astro-cid-4ynrdyaf] {
+            flex-direction: column;
+            flex: 1;
+            gap: 4px;
+            min-width: 0;
+            display: flex
+        }
+
+        .hitokoto-text[data-astro-cid-4ynrdyaf] {
+            color: var(--text-primary);
+            word-break: break-word;
+            font-size: 14px;
+            line-height: 1.5
+        }
+
+        .hitokoto-from[data-astro-cid-4ynrdyaf] {
+            color: var(--text-muted);
+            text-align: right;
+            font-size: 12px
+        }
+
+        .hitokoto-actions[data-astro-cid-4ynrdyaf] {
+            flex-shrink: 0;
+            gap: 8px;
+            display: flex
+        }
+
+        .action-btn[data-astro-cid-4ynrdyaf] {
+            border: 1px solid var(--border-color);
+            background: var(--btn-bg);
+            width: 36px;
+            height: 36px;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-radius: 10px;
+            justify-content: center;
+            align-items: center;
+            transition: all .3s;
+            display: flex
+        }
+
+        .action-btn[data-astro-cid-4ynrdyaf]:hover {
+            background: #80808040;
+            transform: translateY(-2px)
+        }
+
+        .action-btn[data-astro-cid-4ynrdyaf].copied {
+            background: #4caf504d;
+            border-color: #4caf50
+        }
+
+        .action-btn[data-astro-cid-4ynrdyaf].loading svg[data-astro-cid-4ynrdyaf] {
+            animation: 1s linear infinite spin
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0)
+            }
+
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .readme-card[data-astro-cid-vya2hfqh] {
+            width: 100%;
+            padding: 20px
+        }
+
+        .readme-header[data-astro-cid-vya2hfqh] {
+            cursor: pointer;
+            user-select: none;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            display: flex
+        }
+
+        .readme-header[data-astro-cid-vya2hfqh]:hover .toggle-btn[data-astro-cid-vya2hfqh] {
+            opacity: .8
+        }
+
+        .readme-title[data-astro-cid-vya2hfqh] {
+            color: var(--text-primary);
+            flex: 1;
+            margin: 0;
+            font-size: 16px
+        }
+
+        .toggle-btn[data-astro-cid-vya2hfqh] {
+            color: var(--text-secondary);
+            cursor: pointer;
+            opacity: .6;
+            background: 0 0;
+            border: none;
+            border-radius: 6px;
+            justify-content: center;
+            align-items: center;
+            padding: 4px 8px;
+            transition: all .3s;
+            display: flex
+        }
+
+        .toggle-btn[data-astro-cid-vya2hfqh]:hover {
+            background: var(--btn-bg);
+            opacity: 1
+        }
+
+        .toggle-btn[data-astro-cid-vya2hfqh]:focus-visible {
+            outline: 2px solid var(--text-primary);
+            outline-offset: 2px
+        }
+
+        .toggle-icon[data-astro-cid-vya2hfqh] {
+            transition: transform .3s
+        }
+
+        .toggle-icon[data-astro-cid-vya2hfqh].collapsed {
+            transform: rotate(-90deg)
+        }
+
+        .readme-content-wrapper[data-astro-cid-vya2hfqh] {
+            opacity: 1;
+            max-height: 600px;
+            transition: max-height .4s, opacity .3s;
+            overflow: hidden
+        }
+
+        .readme-content-wrapper[data-astro-cid-vya2hfqh].collapsed {
+            opacity: 0;
+            margin-top: 0;
+            padding-top: 0;
+            max-height: 0 !important
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] {
+            color: var(--text-secondary);
+            max-height: 500px;
+            padding-top: 4px;
+            padding-right: 8px;
+            font-size: 14px;
+            line-height: 1.7;
+            overflow-y: auto
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] h1 {
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            margin: 20px 0 10px;
+            padding-bottom: 8px;
+            font-size: 1.5em;
+            font-weight: 700
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] h2 {
+            color: var(--text-primary);
+            margin: 18px 0 8px;
+            font-size: 1.3em;
+            font-weight: 600
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] h3 {
+            color: var(--text-primary);
+            margin: 14px 0 6px;
+            font-size: 1.15em;
+            font-weight: 600
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] h4 {
+            color: var(--text-primary);
+            margin: 12px 0 6px;
+            font-size: 1em;
+            font-weight: 600
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] h5,
+        .readme-content[data-astro-cid-vya2hfqh] h6 {
+            color: var(--text-primary);
+            margin: 10px 0 4px;
+            font-size: .9em;
+            font-weight: 600
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] p {
+            color: var(--text-secondary);
+            margin: 8px 0
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] a {
+            color: #58a6ff;
+            text-decoration: none;
+            transition: color .2s
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] a:hover {
+            color: #79c0ff;
+            text-decoration: underline
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] strong {
+            color: var(--text-primary);
+            font-weight: 700
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] em {
+            color: var(--text-secondary);
+            font-style: italic
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] del {
+            color: var(--text-muted)
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] code {
+            background: var(--btn-bg);
+            color: #f0883e;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+            font-size: .88em
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] pre {
+            background: var(--bg-card-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 14px;
+            overflow-x: auto
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] pre code {
+            color: var(--text-primary);
+            background: 0 0;
+            padding: 0;
+            font-size: .85em
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] ul,
+        .readme-content[data-astro-cid-vya2hfqh] ol {
+            margin: 8px 0;
+            padding-left: 24px
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] li {
+            color: var(--text-secondary);
+            margin: 4px 0
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] li input[type=checkbox] {
+            margin-right: 6px
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] blockquote {
+            border-left: 3px solid var(--border-color);
+            color: var(--text-muted);
+            background: var(--btn-bg);
+            border-radius: 0 6px 6px 0;
+            margin: 10px 0;
+            padding: 4px 12px
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] blockquote p {
+            margin: 4px 0
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            display: block;
+            overflow-x: auto
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] th,
+        .readme-content[data-astro-cid-vya2hfqh] td {
+            border: 1px solid var(--border-color);
+            text-align: left;
+            padding: 8px 12px
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] th {
+            background: var(--btn-bg);
+            color: var(--text-primary);
+            font-weight: 600
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] td {
+            color: var(--text-secondary)
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] img {
+            border-radius: 8px;
+            max-width: 100%;
+            margin: 8px 0
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh] hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 16px 0
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh]::-webkit-scrollbar {
+            width: 6px;
+            height: 6px
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh]::-webkit-scrollbar-track {
+            background: 0 0
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh]::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px
+        }
+
+        .readme-content[data-astro-cid-vya2hfqh]::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted)
+        }
+
+        @font-face {
+            font-family: AaCute;
+            src: url(/new/AaCute.ttf)format("truetype");
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html,
+        body {
+            min-height: 100vh;
+            font-family: AaCute, -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: background-color .3s, color .3s
+        }
+
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-card: #141414a6;
+            --bg-card-inner: #28282880;
+            --text-primary: #fff;
+            --text-secondary: #ccc;
+            --text-muted: #888;
+            --border-color: #ffffff1a;
+            --overlay-color: #00000026;
+            --btn-bg: #ffffff1a;
+            --btn-text: #fff
+        }
+
+        :root.light {
+            --bg-primary: #f0f0f0;
+            --bg-card: #ffffffd9;
+            --bg-card-inner: #e6e6e6cc;
+            --text-primary: #1a1a1a;
+            --text-secondary: #444;
+            --text-muted: #777;
+            --border-color: #0000001a;
+            --overlay-color: #ffffff4d;
+            --btn-bg: #00000014;
+            --btn-text: #1a1a1a
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            display: flex
+        }
+
+        .background-image {
+            z-index: 0;
+            background-image: url(https://api.yppp.net/api.php);
+            background-position: 50%;
+            background-repeat: no-repeat;
+            background-size: cover;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0
+        }
+
+        .background-overlay {
+            background: var(--overlay-color);
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0
+        }
+
+        .container {
+            z-index: 2;
+            width: 100%;
+            max-width: 730px;
+            position: relative
+        }
+
+        .theme-toggle {
+            z-index: 100;
+            cursor: pointer;
+            background: var(--bg-card);
+            -webkit-backdrop-filter: blur(12px);
+            border: none;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            transition: all .3s;
+            display: flex;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            box-shadow: 0 4px 15px #0000001a
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px #00000026
+        }
+
+        .theme-toggle .icon-sun {
+            display: none
+        }
+
+        .theme-toggle .icon-moon,
+        :root.light .theme-toggle .icon-sun {
+            display: block
+        }
+
+        :root.light .theme-toggle .icon-moon {
+            display: none
+        }
+
+        .glass-card {
+            transition: all .3s;
+            background: var(--bg-card) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 16px !important
+        }
+
+        .glass-card,
+        .glass-card *,
+        .glass-card h4,
+        .glass-card h5 {
+            color: var(--text-primary) !important
+        }
+
+        .glass-card p {
+            color: var(--text-secondary) !important
+        }
+
+        .glass-card del {
+            color: var(--text-muted) !important
+        }
+
+        .glass-card a {
+            color: var(--text-primary) !important
+        }
+
+        .inner-card {
+            background: var(--bg-card-inner) !important
+        }
+
+        .skill-badge {
+            background: var(--btn-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-color) !important
+        }
+
+        .link-btn {
+            background: var(--btn-bg) !important;
+            color: var(--btn-text) !important;
+            border: 1px solid var(--border-color) !important
+        }
+
+        .link-btn svg {
+            fill: var(--btn-text) !important
+        }
+
+        .outer-grid {
+            grid-template-columns: 1fr 2fr;
+            align-items: start;
+            gap: 12px;
+            display: grid
+        }
+
+        .column-left,
+        .column-right {
+            flex-direction: column;
+            gap: 12px;
+            display: flex
+        }
+
+        @media (width<=768px) {
+            .outer-grid {
+                grid-template-columns: 1fr
+            }
+
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+                top: 10px;
+                right: 10px
+            }
+        }
+    </style>
+    <script type="module" src="/new/_astro/page.sVsxvrj0.js"></script>
+</head>
+
+<body>
+    <div class="background-image"></div>
+    <div class="background-overlay"></div>
+    <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">
+        <span class="icon-sun">☀️</span>
+        <span class="icon-moon">🌙</span>
+    </button>
+    <main class="container">
+        <div class="outer-grid">
+            <div class="column-left">
+                <div class="glass-card"
+                    style="width: 100%; min-height: 80px; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                    <div class="sui-user-container">
+                        <div class="sui-avatar-container">
+                            <img src="https://yang-bone.github.io/new/IMG_202606185314_400x420.png" loading="lazy"
+                                alt="Avatar" decoding="async" width="1080" height="1080" class="sui-avatar-img">
+                        </div>
+                        <div class="sui-text-content">
+                            <span class="sui-name">Yang_bone</span>
+                            <span class="sui-description">永远相信美好的事情即将发生</span>
                         </div>
                     </div>
-                    <div class="glass-card time-card" data-astro-cid-qdxkhx7a>
-                        <span class="time-icon" data-astro-cid-qdxkhx7a>⏰</span>
-                        <span id="time-display" class="time-text" data-astro-cid-qdxkhx7a>Loading...</span>
-                    </div>
-                    <script type="module">
-                        function e() {
-                            let e = new Date
-                              , t = {
+                </div>
+                <div class="glass-card time-card" data-astro-cid-qdxkhx7a>
+                    <span class="time-icon" data-astro-cid-qdxkhx7a>⏰</span>
+                    <span id="time-display" class="time-text" data-astro-cid-qdxkhx7a>Loading...</span>
+                </div>
+                <script type="module">
+                    function e() {
+                        let e = new Date
+                            , t = {
                                 hour: `2-digit`,
                                 minute: `2-digit`,
                                 second: `2-digit`,
                                 hour12: !1
                             };
-                            document.getElementById(`time-display`).textContent = e.toLocaleTimeString(`zh-CN`, t)
-                        }
-                        e(),
+                        document.getElementById(`time-display`).textContent = e.toLocaleTimeString(`zh-CN`, t)
+                    }
+                    e(),
                         setInterval(e, 1e3);
-                    </script>
-                    <div class="glass-card" style="width: 100%; height: 100%; padding: 20px;">
-                        <h4 style="margin-bottom: 12px; font-size: 16px;">🧑‍💻 关于我</h4>
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <del style="color: var(--text-muted);">一个喜欢折腾的人</del>
-                            <div style="color: var(--text-secondary);">喜欢研究 AI ，css, javascript, python, html, scratch, 剪辑等一些东西 </div>
+                </script>
+                <div class="glass-card" style="width: 100%; height: 100%; padding: 20px;">
+                    <h4 style="margin-bottom: 12px; font-size: 16px;">🧑‍💻 关于我</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <del style="color: var(--text-muted);">一个喜欢折腾的人</del>
+                        <div style="color: var(--text-secondary);">喜欢研究 AI ，css, javascript, python, html, scratch,
+                            剪辑等一些东西 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column-right">
+                <div class="glass-card readme-card" data-astro-cid-vya2hfqh>
+                    <div class="readme-header" id="readme-toggle" data-astro-cid-vya2hfqh>
+                        <h4 class="readme-title" data-astro-cid-vya2hfqh>📖 README</h4>
+                        <button class="toggle-btn" id="readme-toggle-btn" aria-label="切换 README 显示"
+                            data-astro-cid-vya2hfqh>
+                            <svg class="toggle-icon" viewBox="0 0 24 24" width="20" height="20" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                data-astro-cid-vya2hfqh>
+                                <polyline points="6 9 12 15 18 9" data-astro-cid-vya2hfqh></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="readme-content-wrapper" id="readme-content-wrapper" data-astro-cid-vya2hfqh>
+                        <div class="readme-content" data-astro-cid-vya2hfqh>
+                            <div data-astro-cid-vya2hfqh>
+                                <h1>
+                                    <a href="https://yang-bone.github.io/new">Yang_bone</a>
+                                </h1>
+                                <blockquote>
+                                    <p>你好 Yang_bone！</p>
+                                </blockquote>
+                                <h2>👤 关于我</h2>
+                                <ul>
+                                    <li>
+                                        <strong>昵称</strong>
+                                        : Yang_bone
+                                    </li>
+                                    <li>
+                                        <strong>QQ</strong>
+                                        : <a href="https://qm.qq.com/q/jvHsCgdhg4">3939087418</a>
+                                    </li>
+                                </ul>
+                                <p>
+                                    <img src="https://yang-bone.github.io/new/da0a3db1b3894070a8a62c7b2d08f7f5_th%5B1%5D.gif"
+                                        alt="Yang_bone GitHub Game">
+                                </p>
+                                <h2>🔗 链接</h2>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>链接</th>
+                                            <th>地址</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>🏠 个人主页(新版)</td>
+                                            <td>
+                                                <a href="https://yang-bone.github.io/new">yang-bone.github.io/new</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>🏠 个人主页(旧版)</td>
+                                            <td>
+                                                <a href="https://yang-bone.github.io">yang-bone.github.io</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>📚 文档站</td>
+                                            <td>
+                                                <a href="https://yang-bone.github.io/docs">yang-bone.github.io/docs</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>💻 GitHub</td>
+                                            <td>
+                                                <a href="https://github.com/Yang-bone">Yang-bone</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>🛠️ CCW</td>
+                                            <td>
+                                                <a
+                                                    href="https://www.ccw.site/student/6540f18c1ddb475eb21f6948">Yang-B（第个一号）</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>▶️ 快手</td>
+                                            <td>
+                                                <a
+                                                    href="https://www.kuaishou.com/profile/3xk5msg2bdegdzc">Yang-b（第一个号）</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>▶️ Bilibili</td>
+                                            <td>
+                                                <a href="https://space.bilibili.com/3546611758140340">omy魄炮弹</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>🐧 QQ</td>
+                                            <td>
+                                                <a href="https://qm.qq.com/q/98HkPwmGVq">Yang-b(第二个号)＾v＾</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>🔔 Codelab</td>
+                                            <td>
+                                                <a href="https://create.codelab.club/users/Yang_b1/">Yang_b1</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>🎮 Waku</td>
+                                            <td>
+                                                <a href="https://wakudemo.cn/users/9142">Yangbone一号</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>💠 Projects</td>
+                                            <td>
+                                                <a href="https://yang-bone.github.io/projects">Yang_bone的项目</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <hr>
+                                <p>
+                                    <a href="https://ghfind.com/u/Yang-bone">
+                                        <img src="https://ghfind.com/api/card/Yang-bone?theme=dark&variant=path"
+                                            alt="GitHub Roast">
+                                    </a>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="column-right">
-                    <div class="glass-card readme-card" data-astro-cid-vya2hfqh>
-                        <div class="readme-header" id="readme-toggle" data-astro-cid-vya2hfqh>
-                            <h4 class="readme-title" data-astro-cid-vya2hfqh>📖 README</h4>
-                            <button class="toggle-btn" id="readme-toggle-btn" aria-label="切换 README 显示" data-astro-cid-vya2hfqh>
-                                <svg class="toggle-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-vya2hfqh>
-                                    <polyline points="6 9 12 15 18 9" data-astro-cid-vya2hfqh></polyline>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="readme-content-wrapper" id="readme-content-wrapper" data-astro-cid-vya2hfqh>
-                            <div class="readme-content" data-astro-cid-vya2hfqh>
-                                <div data-astro-cid-vya2hfqh>
-                                    <h1>
-                                        <a href="https://yang-bone.github.io/new">Yang_bone</a>
-                                    </h1>
-                                    <blockquote>
-                                        <p>你好 Yang_bone！</p>
-                                    </blockquote>
-                                    <h2>👤 关于我</h2>
-                                    <ul>
-                                        <li>
-                                            <strong>昵称</strong>
-                                            : Yang_bone
-                                        </li>
-                                        <li>
-                                            <strong>QQ</strong>
-                                            : <a href="https://qm.qq.com/q/jvHsCgdhg4">3939087418</a>
-                                        </li>
-                                    </ul>
-                                    <p>
-                                        <img src="https://yang-bone.github.io/new/da0a3db1b3894070a8a62c7b2d08f7f5_th%5B1%5D.gif" alt="Yang_bone GitHub Game">
-                                    </p>
-                                    <h2>🔗 链接</h2>
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>链接</th>
-                                                <th>地址</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>🏠 个人主页(新版)</td>
-                                                <td>
-                                                    <a href="https://yang-bone.github.io/new">yang-bone.github.io/new</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>🏠 个人主页(旧版)</td>
-                                                <td>
-                                                    <a href="https://yang-bone.github.io">yang-bone.github.io</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>📚 文档站</td>
-                                                <td>
-                                                    <a href="https://yang-bone.github.io/docs">yang-bone.github.io/docs</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>💻 GitHub</td>
-                                                <td>
-                                                    <a href="https://github.com/Yang-bone">Yang-bone</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>🛠️ CCW</td>
-                                                <td>
-                                                    <a href="https://www.ccw.site/student/6540f18c1ddb475eb21f6948">Yang-B（第个一号）</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>▶️ 快手</td>
-                                                <td>
-                                                    <a href="https://www.kuaishou.com/profile/3xk5msg2bdegdzc">Yang-b（第一个号）</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>▶️ Bilibili</td>
-                                                <td>
-                                                    <a href="https://space.bilibili.com/3546611758140340">omy魄炮弹</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>🐧 QQ</td>
-                                                <td>
-                                                    <a href="https://qm.qq.com/q/98HkPwmGVq">Yang-b(第二个号)＾v＾</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>🔔 Codelab</td>
-                                                <td>
-                                                    <a href="https://create.codelab.club/users/Yang_b1/">Yang_b1</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>🎮 Waku</td>
-                                                <td>
-                                                    <a href="https://wakudemo.cn/users/9142">Yangbone一号</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>💠 Projects</td>
-                                                <td>
-                                                    <a href="https://yang-bone.github.io/projects">Yang_bone的项目</a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <hr>
-                                    <p>
-                                        <a href="https://ghfind.com/u/Yang-bone">
-                                            <img src="https://ghfind.com/api/card/Yang-bone?theme=dark&variant=path" alt="GitHub Roast">
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <script type="module">
-                        (function() {
-                            let e = document.getElementById(`readme-toggle-btn`)
-                              , t = document.getElementById(`readme-content-wrapper`)
-                              , n = e?.querySelector(`.toggle-icon`);
-                            !e || !t || (localStorage.getItem(`readme-collapsed`) === `true` && (t.classList.add(`collapsed`),
+                <script type="module">
+                    (function () {
+                        let e = document.getElementById(`readme-toggle-btn`)
+                            , t = document.getElementById(`readme-content-wrapper`)
+                            , n = e?.querySelector(`.toggle-icon`);
+                        !e || !t || (localStorage.getItem(`readme-collapsed`) === `true` && (t.classList.add(`collapsed`),
                             n?.classList.add(`collapsed`)),
-                            e.addEventListener(`click`, function(e) {
+                            e.addEventListener(`click`, function (e) {
                                 e.stopPropagation();
                                 let r = !t.classList.contains(`collapsed`);
                                 t.classList.toggle(`collapsed`),
-                                n?.classList.toggle(`collapsed`),
-                                localStorage.setItem(`readme-collapsed`, String(r))
+                                    n?.classList.toggle(`collapsed`),
+                                    localStorage.setItem(`readme-collapsed`, String(r))
                             }),
-                            document.getElementById(`readme-toggle`)?.addEventListener(`click`, function(t) {
+                            document.getElementById(`readme-toggle`)?.addEventListener(`click`, function (t) {
                                 t.target.closest(`.toggle-btn`) || e.click()
                             }))
-                        }
-                        )();
-                    </script>
-                    <div class="glass-card hitokoto-card" data-astro-cid-4ynrdyaf>
-                        <div class="hitokoto-content" data-astro-cid-4ynrdyaf>
-                            <span class="hitokoto-text" id="hitokoto-text" data-astro-cid-4ynrdyaf>加载中...</span>
-                            <span class="hitokoto-from" id="hitokoto-from" data-astro-cid-4ynrdyaf></span>
-                        </div>
-                        <div class="hitokoto-actions" data-astro-cid-4ynrdyaf>
-                            <button class="action-btn" id="copy-btn" title="复制一言" data-astro-cid-4ynrdyaf>
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-4ynrdyaf>
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" data-astro-cid-4ynrdyaf></rect>
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" data-astro-cid-4ynrdyaf></path>
-                                </svg>
-                            </button>
-                            <button class="action-btn" id="refresh-btn" title="换一条" data-astro-cid-4ynrdyaf>
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-4ynrdyaf>
-                                    <path d="M23 4v6h-6" data-astro-cid-4ynrdyaf></path>
-                                    <path d="M1 20v-6h6" data-astro-cid-4ynrdyaf></path>
-                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" data-astro-cid-4ynrdyaf></path>
-                                </svg>
-                            </button>
-                        </div>
+                    }
+                    )();
+                </script>
+                <div class="glass-card hitokoto-card" data-astro-cid-4ynrdyaf>
+                    <div class="hitokoto-content" data-astro-cid-4ynrdyaf>
+                        <span class="hitokoto-text" id="hitokoto-text" data-astro-cid-4ynrdyaf>加载中...</span>
+                        <span class="hitokoto-from" id="hitokoto-from" data-astro-cid-4ynrdyaf></span>
                     </div>
-                    <script type="module">
-                        var e = document.getElementById(`hitokoto-text`)
-                          , t = document.getElementById(`hitokoto-from`)
-                          , n = document.getElementById(`refresh-btn`)
-                          , r = document.getElementById(`copy-btn`)
-                          , i = ``;
-                        async function a() {
-                            n.classList.add(`loading`),
+                    <div class="hitokoto-actions" data-astro-cid-4ynrdyaf>
+                        <button class="action-btn" id="copy-btn" title="复制一言" data-astro-cid-4ynrdyaf>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-4ynrdyaf>
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" data-astro-cid-4ynrdyaf></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                                    data-astro-cid-4ynrdyaf></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn" id="refresh-btn" title="换一条" data-astro-cid-4ynrdyaf>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-4ynrdyaf>
+                                <path d="M23 4v6h-6" data-astro-cid-4ynrdyaf></path>
+                                <path d="M1 20v-6h6" data-astro-cid-4ynrdyaf></path>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                                    data-astro-cid-4ynrdyaf></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <script type="module">
+                    var e = document.getElementById(`hitokoto-text`)
+                        , t = document.getElementById(`hitokoto-from`)
+                        , n = document.getElementById(`refresh-btn`)
+                        , r = document.getElementById(`copy-btn`)
+                        , i = ``;
+                    async function a() {
+                        n.classList.add(`loading`),
                             e.textContent = `加载中...`,
                             t.textContent = ``;
-                            try {
-                                let n = await (await fetch(`https://v1.hitokoto.cn`)).json();
-                                i = n.hitokoto || `获取失败`,
+                        try {
+                            let n = await (await fetch(`https://v1.hitokoto.cn`)).json();
+                            i = n.hitokoto || `获取失败`,
                                 e.textContent = i,
                                 n.from && (t.textContent = `—— ${n.from}`)
-                            } catch (t) {
-                                e.textContent = `获取一言失败，请重试`,
+                        } catch (t) {
+                            e.textContent = `获取一言失败，请重试`,
                                 i = ``,
                                 console.error(`Hitokoto API error:`, t)
-                            } finally {
-                                n.classList.remove(`loading`)
-                            }
+                        } finally {
+                            n.classList.remove(`loading`)
                         }
-                        async function o() {
-                            if (i)
-                                try {
-                                    await navigator.clipboard.writeText(i),
+                    }
+                    async function o() {
+                        if (i)
+                            try {
+                                await navigator.clipboard.writeText(i),
                                     r.classList.add(`copied`),
                                     r.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
-                                    setTimeout( () => {
+                                    setTimeout(() => {
                                         r.classList.remove(`copied`),
-                                        r.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`
+                                            r.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`
                                     }
-                                    , 1500)
-                                } catch (e) {
-                                    console.error(`Copy failed:`, e)
-                                }
-                        }
-                        a(),
+                                        , 1500)
+                            } catch (e) {
+                                console.error(`Copy failed:`, e)
+                            }
+                    }
+                    a(),
                         n.addEventListener(`click`, a),
                         r.addEventListener(`click`, o);
-                    </script>
-                    <div class="glass-card" style="width: 100%; padding: 16px 20px;" data-astro-cid-6754zdfc>
-                        <div class="footer-content" data-astro-cid-6754zdfc>
-                            <div class="footer-top" data-astro-cid-6754zdfc>
-                                <span data-astro-cid-6754zdfc>© 2026</span>
-                                <a href="https://yang-bone.github.io/new" style="color: inherit; text-decoration: none;" data-astro-cid-6754zdfc>yang-bone.github.io/new</a>
-                                <a href="https://hyperos.mi.com/font" style="color: inherit; text-decoration: none;" data-astro-cid-6754zdfc>AaCute</a>
-                            </div>
-                            <div class="footer-bottom" data-astro-cid-6754zdfc>
-                                <a href="https://icp.gov.moe/?keyword=20264052" target="_blank" style="color: inherit; text-decoration: none;" data-astro-cid-6754zdfc>萌ICP备20264052号</a>
-                            </div>
+                </script>
+                <div class="glass-card" style="width: 100%; padding: 16px 20px;" data-astro-cid-6754zdfc>
+                    <div class="footer-content" data-astro-cid-6754zdfc>
+                        <div class="footer-top" data-astro-cid-6754zdfc>
+                            <span data-astro-cid-6754zdfc>© 2026</span>
+                            <a href="https://yang-bone.github.io/new" style="color: inherit; text-decoration: none;"
+                                data-astro-cid-6754zdfc>yang-bone.github.io/new</a>
+                            <a href="https://hyperos.mi.com/font" style="color: inherit; text-decoration: none;"
+                                data-astro-cid-6754zdfc>AaCute</a>
+                        </div>
+                        <div class="footer-bottom" data-astro-cid-6754zdfc>
+                            <a href="https://icp.gov.moe/?keyword=20264052" target="_blank"
+                                style="color: inherit; text-decoration: none;"
+                                data-astro-cid-6754zdfc>萌ICP备20264052号</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
-        <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"dd9619be96b3460185a105cfa3b48e4f","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-    </body>
+        </div>
+    </main>
+    <script defer
+        src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496"
+        integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ=="
+        data-cf-beacon='{"version":"2024.11.0","token":"dd9619be96b3460185a105cfa3b48e4f","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+        crossorigin="anonymous"></script>
+</body>
+
 </html>
 <script type="module">
     var e = document.getElementById(`theme-toggle`)
-      , t = document.documentElement;
+        , t = document.documentElement;
     localStorage.getItem(`theme`) === `light` && t.classList.add(`light`),
-    e.addEventListener(`click`, () => {
-        t.classList.toggle(`light`);
-        let e = t.classList.contains(`light`);
-        localStorage.setItem(`theme`, e ? `light` : `dark`)
-    }
-    );
+        e.addEventListener(`click`, () => {
+            t.classList.toggle(`light`);
+            let e = t.classList.contains(`light`);
+            localStorage.setItem(`theme`, e ? `light` : `dark`)
+        }
+        );
 </script>

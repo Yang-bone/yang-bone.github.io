@@ -1,158 +1,137 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Yang_bone | 我的文档站</title>
-        <link rel="icon" href="https://raw.githubusercontent.com/Yang-bone/yang-bone.github.io/refs/heads/main/tou.png" type="image/png">
-        <link rel="stylesheet" href="./assets/style.DN9XD1Jq.css">
-        <style>
-            ::backdrop {
-                background-color: rgba(100, 100, 100, 0.8);
-            }
-            body {
-                min-height: 100vh;
-                margin: 0;
-                color: #f4f1f8;
-                background: #17171d url('./background.png') center / cover fixed;
-                font-family: system-ui, sans-serif;
-            }
-            main {
-                width: min(720px, calc(100% - 40px));
-                margin: 0 auto;
-                padding: 48px 0;
-            }
-            .identity {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                margin-bottom: 48px;
-            }
-            .avatar {
-                width: 44px;
-                height: 44px;
-                border-radius: 50%;
-                object-fit: cover;
-            }
-            .identity strong {
-                font-size: 18px;
-            }
-            .github-link {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                margin-left: auto;
-                color: inherit;
-                text-decoration: none;
-            }
-            .github-link img {
-                width: 24px;
-                height: 24px;
-                filter: invert(1);
-            }
-            h1 {
-                color: #3E2962;
-                font-size: 32px;
-                text-shadow: 0 0 60px #3E2962;
-                font-family: 'Adofai2', sans-serif;
-            }
-            p {
-                color: #3E2962;
-                font-family: 'Adofai', sans-serif;
-            }
-            .back-link {
-                color: #ffb454;
-            }
-            #fireworks {
-                position: fixed;
-                inset: 0;
-                z-index: 9999;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-            }
-        </style>
-    </head>
-    <body>
-        <main>
-            <header class="identity">
-                <img class="avatar" src="https://raw.githubusercontent.com/Yang-bone/yang-bone.github.io/refs/heads/main/tou.png" alt="Yang_bone 头像">
-                <strong>Yang_bone</strong>
-                <a class="github-link" href="https://github.com/Yang-bone" target="_blank" rel="noopener noreferrer">
-                    <img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='black' d='M12 .297c-6.63 0-12 5.373-12 12c0 5.303 3.438 9.8 8.205 11.385c.6.113.82-.258.82-.577c0-.285-.01-1.04-.015-2.04c-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729c1.205.084 1.838 1.236 1.838 1.236c1.07 1.835 2.809 1.305 3.495.998c.108-.776.417-1.305.76-1.605c-2.665-.3-5.466-1.332-5.466-5.93c0-1.31.465-2.38 1.235-3.22c-.135-.303-.54-1.523.105-3.176c0 0 1.005-.322 3.3 1.23c.96-.267 1.98-.399 3-.405c1.02.006 2.04.138 3 .405c2.28-1.552 3.285-1.23 3.285-1.23c.645 1.653.24 2.873.12 3.176c.765.84 1.23 1.91 1.23 3.22c0 4.61-2.805 5.625-5.475 5.92c.42.36.81 1.096.81 2.22c0 1.606-.015 2.896-.015 3.286c0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E">
-                    GitHub
-                </a>
-            </header>
-            <a class="back-link" href="https://yang-bone.github.io/new">返回</a>
+<html lang="zh-CN" data-theme="dark" data-layout="balanced" data-spotlight-style="block">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1b1b1f">
+    <meta name="description" content="Yang_bone 的文档与笔记">
+    <title>Yang_bone | 叹号大帝文档站</title>
+    <link rel="icon" href="./logo.png" type="image/png">
+    <link rel="stylesheet" href="./style.css">
+    <script src="./app.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#mainContent">跳转到正文</a>
+    <header class="topbar">
+        <a class="brand" href="#top" aria-label="Yang_bone 文档站首页">
+            <img src="./logo.png" alt="">
+            <span class="brand-mark" aria-hidden="true" hidden>!</span>
+            <span class="brand-name">Yang_bone</span>
+        </a>
+        <nav class="toolbar" aria-label="主导航">
+            <button class="tool-button mobile-menu" id="menuButton" type="button" aria-label="打开目录" aria-expanded="false">
+                <span class="icon icon-menu" aria-hidden="true"></span>
+            </button>
+            <button class="tool-button search-trigger" id="searchButton" type="button" aria-label="搜索文档">
+                <span class="icon icon-search" aria-hidden="true"></span><span>Search</span><kbd>Ctrl K</kbd>
+            </button>
+            <span class="toolbar-spacer"></span>
+            <a class="tool-button desktop-label" href="https://yang-bone.github.io/">主页</a>
+            <a class="tool-button active-link" href="#start"><span aria-hidden="true">🚀</span><span class="desktop-label">从这里开始</span></a>
+            <button class="tool-button" id="themeButton" type="button" aria-label="切换主题" title="切换主题" aria-pressed="false">
+                <span class="icon icon-theme" aria-hidden="true"></span>
+            </button>
+            <a class="tool-button" href="https://github.com/Yang-bone" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+                <span class="vpi-social-github" aria-hidden="true"></span>
+            </a>
+            <div class="settings-wrap">
+                <button class="tool-button" id="settingsButton" type="button" aria-label="打开显示设置" aria-expanded="false" aria-controls="settingsPanel" title="显示设置">
+                    <span class="icon icon-reading" aria-hidden="true"></span><span class="icon-chevron" aria-hidden="true">⌄</span>
+                </button>
+                <section class="settings-panel" id="settingsPanel" aria-label="显示设置" hidden>
+                    <div class="setting-group">
+                        <div class="setting-label">布局切换</div>
+                        <div class="setting-options" role="group" aria-label="布局切换">
+                            <button class="setting-option" data-layout-choice="narrow" type="button" aria-label="窄幅布局" title="窄幅布局"><span class="layout-icon layout-narrow" aria-hidden="true"></span></button>
+                            <button class="setting-option" data-layout-choice="balanced" type="button" aria-label="标准布局" title="标准布局"><span class="layout-icon layout-balanced" aria-hidden="true"></span></button>
+                            <button class="setting-option" data-layout-choice="wide" type="button" aria-label="宽幅布局" title="宽幅布局"><span class="layout-icon layout-wide" aria-hidden="true"></span></button>
+                            <button class="setting-option" data-layout-choice="focus" type="button" aria-label="专注布局" title="专注布局"><span class="layout-icon layout-focus" aria-hidden="true"></span></button>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="setting-label">聚光灯</div>
+                        <div class="setting-options two" role="group" aria-label="聚光灯开关">
+                            <button class="setting-option" id="spotlightOn" type="button" aria-pressed="false">ON</button>
+                            <button class="setting-option" id="spotlightOff" type="button" aria-pressed="true">OFF</button>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="setting-label">聚光灯样式</div>
+                        <div class="setting-options two" role="group" aria-label="聚光灯样式">
+                            <button class="setting-option" data-spotlight-choice="block" type="button" aria-label="背景高亮" title="背景高亮"><span class="spotlight-icon spotlight-block" aria-hidden="true"></span></button>
+                            <button class="setting-option" data-spotlight-choice="line" type="button" aria-label="下划线高亮" title="下划线高亮"><span class="spotlight-icon spotlight-line" aria-hidden="true"></span></button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </nav>
+    </header>
+
+    <div class="page-shell" id="top">
+        <aside class="sidebar" id="sidebar" aria-label="文档目录">
+            <div class="nav-heading">▣&nbsp; 指南</div>
+            <a class="nav-link is-current" href="#start" aria-current="page">从这里开始</a>
+            <a class="nav-link" href="#updates">更新日志</a>
+            <a class="nav-link" href="#support">💗&nbsp; 赞助我们</a>
+        </aside>
+        <button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="关闭目录" hidden></button>
+
+        <main class="main-area" id="mainContent" tabindex="-1">
+            <div class="content-layout">
+                <article class="article" id="article">
+                    <p class="reading-time spotlight-target reveal"><span class="icon icon-calendar" aria-hidden="true"></span>预计阅读 1 分钟</p>
+                    <section class="doc-section reveal" id="start" data-search-title="从这里开始">
+                        <h1 class="section-title spotlight-target"><span class="emoji" aria-hidden="true">🚀</span>从这里开始</h1>
+                        <p class="spotlight-target">欢迎来到叹号大帝的文档站！本页面将帮助你快速了解此文档的结构。</p>
+                    </section>
+                    <section class="doc-section reveal" id="statistics" data-search-title="站点统计">
+                        <h2 class="spotlight-target">站点统计</h2>
+                        <p class="spotlight-target">本站访问统计由 51.la 记录。</p>
+                        <div class="stats-frame spotlight-target" id="la-stats-container" role="region" aria-label="站点访问统计数据"></div>
+                    </section>
+                    <section class="doc-section reveal" id="support" data-search-title="支持我们">
+                        <h2 class="section-title spotlight-target"><span class="emoji" aria-hidden="true">💗</span>支持我们</h2>
+                        <p class="spotlight-target">觉得我们做的还不错？支持一下我们吧~</p>
+                        <p class="spotlight-target">请见 <a class="doc-link" href="./support.html">赞助我们</a></p>
+                        <p class="spotlight-target">非常感谢您的赞助哦，我会继续努力创作的！</p>
+                    </section>
+                    <section class="doc-section reveal" id="updates" data-search-title="更新日志">
+                        <h2 class="spotlight-target">更新日志</h2>
+                        <p class="spotlight-target">查看文档站的内容更新与页面历史。</p>
+                        <details class="history-card spotlight-target">
+                            <summary><span class="icon icon-history" aria-hidden="true"></span><span>查看页面历史</span><span class="history-chevron" aria-hidden="true">⌄</span></summary>
+                            <div class="history-content">
+                                <p>页面内容持续维护中。</p>
+                                <a class="doc-link" href="https://github.com/Yang-bone/yang-bone.github.io" target="_blank" rel="noopener noreferrer">在 GitHub 查看文档仓库</a>
+                            </div>
+                        </details>
+                    </section>
+                    <footer class="footer reveal">
+                        <a class="edit-page" href="https://github.com/Yang-bone/yang-bone.github.io/edit/main/docs/index.html" target="_blank" rel="noopener noreferrer"><span class="icon icon-edit" aria-hidden="true"></span>在 GitHub 上编辑此页</a>
+                        <a href="https://icp.gov.moe/?keyword=20263888" target="_blank" rel="noopener noreferrer">萌ICP备20263888号</a>
+                        <span>Copyright © 2026-present Yang_bone</span>
+                    </footer>
+                </article>
+                <aside class="toc" aria-label="页面导航">
+                    <p class="toc-title">页面导航</p>
+                    <a href="#statistics">站点统计</a>
+                    <a href="#support">支持我们</a>
+                    <a href="#updates">页面历史</a>
+                </aside>
+            </div>
         </main>
-        <canvas id="fireworks" aria-hidden="true"></canvas>
-        <script>
-            const canvas = document.getElementById('fireworks');
-            const context = canvas.getContext('2d');
-            const particles = [];
-            const colors = ['#ff5d8f', '#ffc857', '#70e1c1', '#8bb8ff', '#d39bff'];
-            let animationFrame = 0;
+    </div>
 
-            function resizeCanvas() {
-                const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-                canvas.width = Math.round(window.innerWidth * pixelRatio);
-                canvas.height = Math.round(window.innerHeight * pixelRatio);
-                context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-            }
-
-            function burst(x, y) {
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                const count = 56;
-
-                for (let index = 0; index < count; index += 1) {
-                    const angle = (Math.PI * 2 * index) / count + Math.random() * 0.12;
-                    const speed = 1.5 + Math.random() * 4.5;
-                    particles.push({
-                        x,
-                        y,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed,
-                        life: 1,
-                        decay: 0.012 + Math.random() * 0.012,
-                        size: 1.5 + Math.random() * 2.5,
-                        color
-                    });
-                }
-
-                if (!animationFrame) animationFrame = requestAnimationFrame(animate);
-            }
-
-            function animate() {
-                context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-                for (let index = particles.length - 1; index >= 0; index -= 1) {
-                    const particle = particles[index];
-                    particle.x += particle.vx;
-                    particle.y += particle.vy;
-                    particle.vy += 0.035;
-                    particle.vx *= 0.985;
-                    particle.vy *= 0.985;
-                    particle.life -= particle.decay;
-
-                    if (particle.life <= 0) {
-                        particles.splice(index, 1);
-                        continue;
-                    }
-
-                    context.globalAlpha = particle.life;
-                    context.fillStyle = particle.color;
-                    context.beginPath();
-                    context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                    context.fill();
-                }
-
-                context.globalAlpha = 1;
-                animationFrame = particles.length ? requestAnimationFrame(animate) : 0;
-            }
-
-            window.addEventListener('resize', resizeCanvas);
-            window.addEventListener('click', (event) => burst(event.clientX, event.clientY));
-            resizeCanvas();
-        </script>
-    </body>
+    <div class="search-overlay" id="searchOverlay" hidden>
+        <section class="search-dialog" role="dialog" aria-modal="true" aria-label="搜索文档">
+            <label class="search-input-wrap">
+                <span class="icon icon-search" aria-hidden="true"></span>
+                <input id="searchInput" type="search" placeholder="搜索文档内容…" autocomplete="off">
+                <kbd>ESC</kbd>
+            </label>
+            <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果"></div>
+            <div class="search-hint">↑↓ 选择 <span>Enter 打开</span></div>
+        </section>
+    </div>
+</body>
 </html>
