@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目下载</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            font-family: "Microsoft YaHei", sans-serif;
+            background: #101714;
+            color: #f1f5f2;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 80% 0%, #263c31 0, #101714 55%);
+        }
+        header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 1100px;
+            margin: auto;
+            padding: 2rem 1.25rem 1.25rem;
+        }
+        #cover {
+            width: 76px;
+            height: 76px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #27332c;
+        }
+        h1 { margin: 0; font-size: 1.5rem; }
+        #description { margin: 0.45rem 0 0; color: #bac7bd; }
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            max-width: 1100px;
+            margin: 0 auto 1rem;
+            padding: 0 1.25rem;
+        }
+        nav a {
+            display: inline-block;
+            padding: 0.7rem 1rem;
+            border: 1px solid #53665a;
+            border-radius: 6px;
+            color: #f1f5f2;
+            text-decoration: none;
+        }
+        nav a:hover { background: #263c31; }
+        nav a[hidden], #source[hidden] { display: none; }
+        #source {
+            display: block;
+            width: min(1100px, calc(100% - 2.5rem));
+            height: min(72vh, 760px);
+            min-height: 420px;
+            margin: 0 auto 2rem;
+            border: 1px solid #53665a;
+            border-radius: 6px;
+            background: #fff;
+        }
+        #status {
+            max-width: 1100px;
+            margin: 0 auto 0.75rem;
+            padding: 0 1.25rem;
+            color: #bac7bd;
+        }
+        @media (max-width: 600px) {
+            header { padding-top: 1.25rem; }
+            #cover { width: 60px; height: 60px; }
+            #source { width: calc(100% - 1.5rem); min-height: 55vh; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img id="cover" alt="项目封面" hidden>
+        <div>
+            <h1 id="title">项目下载</h1>
+            <p id="description"></p>
+        </div>
+    </header>
+    <nav>
+        <a href="/projects/">返回项目列表</a>
+        <a id="openSource" target="_blank" rel="noopener noreferrer">在新页面打开原下载页</a>
+    </nav>
+    <p id="status">正在加载原项目页面……</p>
+    <iframe id="source" title="原项目下载页面"></iframe>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const title = params.get('title') || '项目下载';
+        const description = params.get('description') || '';
+        const image = params.get('image') || '';
+        const source = params.get('url');
+
+        document.title = `${title} - 下载`;
+        document.getElementById('title').textContent = title;
+        document.getElementById('description').textContent = description;
+
+        if (image) {
+            const cover = document.getElementById('cover');
+            cover.src = image;
+            cover.hidden = false;
+        }
+
+        let sourceUrl = null;
+        try {
+            sourceUrl = source ? new URL(source, window.location.origin) : null;
+        } catch {
+            sourceUrl = null;
+        }
+        const allowedHosts = ['yang-bone.github.io', 'yang-bone.de5.net'];
+        if (!sourceUrl || !allowedHosts.includes(sourceUrl.hostname) || !sourceUrl.pathname.includes('/projects/Download-projects/')) {
+            document.getElementById('status').textContent = '下载地址无效，请从项目列表重新进入。';
+            document.getElementById('openSource').hidden = true;
+            document.getElementById('source').hidden = true;
+        } else {
+            sourceUrl.protocol = 'https:';
+            const sourceLink = sourceUrl.href;
+            document.getElementById('openSource').href = sourceLink;
+            document.getElementById('source').src = sourceLink;
+            document.getElementById('source').addEventListener('load', () => {
+                document.getElementById('status').textContent = '如果下方内容未显示，请使用“在新页面打开原下载页”。';
+            });
+        }
+    </script>
+</body>
+</html>

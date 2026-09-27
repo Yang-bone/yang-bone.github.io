@@ -497,5 +497,22 @@
                 </div>
             </div>
         </div>
+        <script>
+            document.addEventListener('click', (event) => {
+                const card = event.target.closest('a.project-card');
+                if (!card || !card.href.includes('/projects/Download-projects/')) {
+                    return;
+                }
+
+                event.preventDefault();
+                const params = new URLSearchParams({
+                    url: card.href,
+                    title: card.querySelector('h3')?.textContent.trim() || '项目下载',
+                    description: card.querySelector('.project-body p')?.textContent.trim() || '',
+                    image: card.querySelector('img')?.src || ''
+                });
+                window.open(`/projects/download.html?${params}`, '_blank', 'noopener');
+            });
+        </script>
     </body>
 </html>
