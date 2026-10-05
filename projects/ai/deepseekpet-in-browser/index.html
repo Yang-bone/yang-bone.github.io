@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#101319">
+	<title>虎鲸 · 选择场景</title>
+	<style>
+		:root {
+			color-scheme: dark;
+			--ink: #f6f5ef;
+			--muted: rgba(246, 245, 239, 0.68);
+			--line: rgba(255, 255, 255, 0.22);
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			min-width: 320px;
+			min-height: 100vh;
+			margin: 0;
+			overflow-x: hidden;
+			color: var(--ink);
+			background: #101319;
+			font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+		}
+
+		.page {
+			position: relative;
+			display: flex;
+			min-height: 100svh;
+			flex-direction: column;
+			padding: clamp(22px, 4vw, 56px);
+			isolation: isolate;
+		}
+
+		.page::before {
+			position: absolute;
+			z-index: -1;
+			inset: 0;
+			background:
+				radial-gradient(ellipse at 50% 0%, rgba(89, 110, 118, 0.22), transparent 50%),
+				linear-gradient(145deg, #171b20, #101319 60%, #171a1d);
+			content: "";
+		}
+
+		.topline {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 18px;
+			font-size: 12px;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--muted);
+		}
+
+		.brand { display: flex; align-items: center; gap: 10px; }
+		.brand-mark { font-size: 20px; filter: saturate(0.8); }
+
+		.intro {
+			width: min(100%, 760px);
+			margin: clamp(52px, 9vh, 108px) auto clamp(30px, 5vh, 56px);
+			text-align: center;
+			animation: rise-in 700ms both;
+		}
+
+		.eyebrow {
+			margin: 0 0 14px;
+			color: #a9d9d1;
+			font-size: 11px;
+			font-weight: 700;
+			letter-spacing: 0.2em;
+			text-transform: uppercase;
+		}
+
+		h1 {
+			margin: 0;
+			font-size: clamp(36px, 6vw, 70px);
+			font-weight: 600;
+			line-height: 1.08;
+		}
+
+		.subtitle {
+			margin: 16px 0 0;
+			color: var(--muted);
+			font-size: clamp(14px, 1.6vw, 17px);
+		}
+
+		.worlds {
+			display: grid;
+			width: min(100%, 1180px);
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 16px;
+			margin: 0 auto;
+			flex: 1;
+			min-height: 340px;
+			max-height: 540px;
+		}
+
+		.world {
+			position: relative;
+			display: flex;
+			min-height: 0;
+			overflow: hidden;
+			flex-direction: column;
+			justify-content: flex-end;
+			padding: clamp(22px, 3vw, 38px);
+			border: 1px solid var(--line);
+			color: var(--ink);
+			text-decoration: none;
+			isolation: isolate;
+			animation: rise-in 700ms 120ms both;
+		}
+
+		.world::before, .world::after { position: absolute; z-index: -1; content: ""; }
+		.world::before { inset: 0; transition: transform 700ms cubic-bezier(.2,.7,.2,1); }
+		.world::after {
+			inset: 35% 0 0;
+			background: linear-gradient(transparent, rgba(10, 13, 17, 0.82));
+		}
+
+		.world:hover::before, .world:focus-visible::before { transform: scale(1.045); }
+		.world:focus-visible { outline: 2px solid #f6f5ef; outline-offset: 4px; }
+
+		.city::before {
+			background:
+				linear-gradient(180deg, rgba(16, 22, 34, 0.08), rgba(9, 14, 24, 0.12)),
+				repeating-linear-gradient(90deg, transparent 0 8%, rgba(115, 221, 236, 0.48) 8.15% 8.35%, transparent 8.5% 12%),
+				linear-gradient(0deg, #121d2b 0 20%, transparent 20%),
+				linear-gradient(90deg, transparent 0 4%, #182637 4% 17%, transparent 17% 20%, #101c2b 20% 31%, transparent 31% 35%, #1b2b3c 35% 47%, transparent 47% 51%, #122031 51% 67%, transparent 67% 71%, #1a2937 71% 83%, transparent 83% 87%, #111e2c 87% 100%),
+				radial-gradient(ellipse at 68% 28%, rgba(81, 231, 221, 0.74), transparent 2%, transparent 100%),
+				linear-gradient(145deg, #163344, #233a50 48%, #111824);
+			background-size: auto, 100% 48%, auto, 100% 76%, auto, auto;
+			background-position: center, center 42%, bottom, bottom, center, center;
+		}
+
+		.shore::before {
+			background:
+				linear-gradient(180deg, transparent 0 49%, rgba(25, 75, 81, 0.25) 49% 100%),
+				radial-gradient(ellipse at 74% 20%, rgba(255, 220, 161, 0.9), transparent 3%, transparent 100%),
+				linear-gradient(175deg, transparent 0 47%, rgba(228, 244, 225, 0.65) 47.3% 48%, transparent 48.4%),
+				linear-gradient(180deg, #b6d9d2 0%, #6faaa7 43%, #3c8788 44%, #276c76 62%, #d8bb8c 63%, #e4cca1 100%);
+			background-size: auto, auto, auto, auto;
+			background-position: center;
+		}
+
+		.world-copy { position: relative; z-index: 1; }
+
+		.world-number {
+			display: block;
+			margin-bottom: 12px;
+			color: rgba(255, 255, 255, 0.72);
+			font-size: 11px;
+			letter-spacing: 0.16em;
+		}
+
+		.world h2 { margin: 0; font-size: clamp(28px, 3.5vw, 42px); font-weight: 600; }
+		.world p { margin: 9px 0 0; color: rgba(255, 255, 255, 0.8); font-size: 14px; }
+
+		.enter {
+			position: absolute;
+			z-index: 1;
+			top: 24px;
+			right: 24px;
+			display: grid;
+			width: 42px;
+			aspect-ratio: 1;
+			place-items: center;
+			border: 1px solid rgba(255, 255, 255, 0.62);
+			border-radius: 50%;
+			background: rgba(11, 17, 22, 0.18);
+			font-size: 19px;
+			transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+		}
+
+		.world:hover .enter, .world:focus-visible .enter {
+			color: #162022;
+			background: var(--ink);
+			transform: translate(2px, -2px);
+		}
+
+		.footer {
+			width: min(100%, 1180px);
+			margin: 22px auto 0;
+			color: rgba(246, 245, 239, 0.46);
+			font-size: 11px;
+			letter-spacing: 0.06em;
+			text-align: center;
+		}
+
+		@keyframes rise-in {
+			from { opacity: 0; transform: translateY(14px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		@media (max-width: 680px) {
+			.page { padding: 22px 18px 18px; }
+			.topline { font-size: 10px; }
+			.intro { margin: 56px auto 30px; }
+			.worlds { grid-template-columns: 1fr; gap: 12px; min-height: 0; max-height: none; }
+			.world { min-height: 230px; }
+			.world h2 { font-size: 30px; }
+			.footer { margin-top: 18px; }
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+		}
+	</style>
+</head>
+<body>
+	<main class="page">
+		<header class="topline">
+			<div class="brand"><span class="brand-mark" aria-hidden="true">🐋</span><span>ORCA WORLDS</span></div>
+			<span>一个虎鲸的两种日常</span>
+		</header>
+
+		<section class="intro" aria-labelledby="page-title">
+			<p class="eyebrow">Choose your world</p>
+			<h1 id="page-title">今天，想去哪里？</h1>
+			<p class="subtitle">选一个目的地，马上出发。</p>
+		</section>
+
+		<nav class="worlds" aria-label="选择场景">
+			<a class="world city" href="cyber-city/index.html" aria-label="进入赛博城市">
+				<span class="enter" aria-hidden="true">↗</span>
+				<div class="world-copy">
+					<span class="world-number">01 / AFTER DARK</span>
+					<h2>赛博城市</h2>
+					<p>霓虹亮起，潜入未来夜色</p>
+				</div>
+			</a>
+			<a class="world shore" href="sea/index.html" aria-label="进入海滩">
+				<span class="enter" aria-hidden="true">↗</span>
+				<div class="world-copy">
+					<span class="world-number">02 / SLOW TIDE</span>
+					<h2>海滩</h2>
+					<p>靠近海风，享受松弛一刻</p>
+				</div>
+			</a>
+		</nav>
+
+		<footer class="footer">选择一处海域，开启你的虎鲸时光</footer>
+	</main>
+</body>
+</html>
