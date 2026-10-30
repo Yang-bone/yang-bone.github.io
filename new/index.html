@@ -407,7 +407,7 @@
 
         .readme-content-wrapper[data-astro-cid-vya2hfqh] {
             opacity: 1;
-            max-height: 600px;
+            max-height: 900px;
             transition: max-height .4s, opacity .3s;
             overflow: hidden
         }
@@ -768,6 +768,72 @@
             color: var(--text-primary) !important
         }
 
+        .questionnaire-panel {
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--bg-card-inner);
+        }
+
+        .questionnaire-panel summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            color: var(--text-primary) !important;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .questionnaire-panel summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .questionnaire-count {
+            color: var(--text-secondary) !important;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .questionnaire-panel-list {
+            display: grid;
+            gap: 8px;
+            margin: 0;
+            padding: 0 14px 14px;
+            list-style: none;
+        }
+
+        .questionnaire-panel-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .questionnaire-panel-item p {
+            margin: 3px 0 0;
+            color: var(--text-secondary) !important;
+            font-size: 12px;
+        }
+
+        .questionnaire-panel-item a {
+            flex: none;
+            color: var(--text-primary);
+        }
+
+        .questionnaire-panel-status {
+            margin: 0;
+            padding: 0 14px 14px;
+            color: var(--text-secondary) !important;
+            font-size: 13px;
+        }
+
         .inner-card {
             background: var(--bg-card-inner) !important
         }
@@ -888,6 +954,15 @@
                         </button>
                     </div>
                     <div class="readme-content-wrapper" id="readme-content-wrapper" data-astro-cid-vya2hfqh>
+                        <details class="questionnaire-panel" id="questionnaire-panel" open>
+                            <summary>
+                                <span>问卷</span>
+                                <span class="questionnaire-count" id="questionnaire-count">正在读取…</span>
+                            </summary>
+                            <p class="questionnaire-panel-status" id="questionnaire-panel-status" role="status"
+                                aria-live="polite">正在读取问卷列表…</p>
+                            <ul class="questionnaire-panel-list" id="questionnaire-panel-list"></ul>
+                        </details>
                         <div class="readme-content" data-astro-cid-vya2hfqh>
                             <div data-astro-cid-vya2hfqh>
                                 <h1>
@@ -1026,6 +1101,161 @@
                             }))
                     }
                     )();
+                </script>
+                <script type="module">
+                    (function () {
+                        const panel = document.getElementById("questionnaire-panel");
+                        const count = document.getElementById("questionnaire-count");
+                        const status = document.getElementById("questionnaire-panel-status");
+                        const list = document.getElementById("questionnaire-panel-list");
+                        if (!panel || !count || !status || !list) return;
+
+                        try {
+                            panel.open = localStorage.getItem("questionnaire-panel-open") !== "false";
+                        } catch (error) {
+                            console.warn("Could not restore questionnaire panel state:", error);
+                        }
+
+                        panel.addEventListener("toggle", function () {
+                            try {
+                                localStorage.setItem("questionnaire-panel-open", String(panel.open));
+                            } catch (error) {
+                                console.warn("Could not save questionnaire panel state:", error);
+                            }
+                        });
+
+                        function parseDate(value) {
+                            const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                            if (!match) return false;
+                            const year = Number(match[1]);
+                            const month = Number(match[2]);
+                            const day = Number(match[3]);
+                            const date = new Date(Date.UTC(year, month - 1, day));
+                            return date.getUTCFullYear() === year
+                                && date.getUTCMonth() === month - 1
+                                && date.getUTCDate() === day;
+                        }
+
+                        function getCookieName(item) {
+                            const key = `${item.title}_${item.startDate}_${item.endDate}`;
+                            return `questionnaire_done_${encodeURIComponent(key)}`;
+                        }
+
+                        function isMarkedComplete(item) {
+                            const cookieName = getCookieName(item);
+                            return document.cookie.split("; ").some((cookie) => cookie.startsWith(`${cookieName}=1`));
+                        }
+
+                        function renderQuestionnaires(items, invalidCount) {
+                            const now = new Date();
+                            const today = [
+                                now.getFullYear(),
+                                String(now.getMonth() + 1).padStart(2, "0"),
+                                String(now.getDate()).padStart(2, "0")
+                            ].join("-");
+                            const activeItems = items.filter((item) =>
+                                item.startDate <= today && today <= item.endDate
+                            );
+
+                            count.textContent = activeItems.length
+                                ? `${activeItems.length} 份可填写`
+                                : "暂无可填写";
+                            list.replaceChildren();
+
+                            if (!activeItems.length) {
+                                status.textContent = "目前没有可填写的问卷。";
+                            } else {
+                                status.textContent = "";
+                            }
+
+                            activeItems.forEach((item) => {
+                                const row = document.createElement("li");
+                                row.className = "questionnaire-panel-item";
+
+                                const details = document.createElement("div");
+                                const title = document.createElement("strong");
+                                title.textContent = item.title;
+                                const dates = document.createElement("p");
+                                dates.textContent = `${item.startDate} 至 ${item.endDate}`;
+                                details.append(title, dates);
+
+                                const link = document.createElement("a");
+                                link.href = item.url;
+                                link.target = "_blank";
+                                link.rel = "noopener noreferrer";
+                                link.textContent = isMarkedComplete(item) ? "已填写（手动标记）" : "填写问卷";
+                                row.append(details, link);
+                                list.append(row);
+                            });
+
+                            if (invalidCount) {
+                                const notice = `有 ${invalidCount} 条问卷记录格式不正确，未显示。`;
+                                status.textContent = status.textContent
+                                    ? `${status.textContent} ${notice}`
+                                    : notice;
+                            }
+                        }
+
+                        async function loadQuestionnaires() {
+                            try {
+                                const response = await fetch("/questionnaire/questionnaire_list", {
+                                    cache: "no-store"
+                                });
+                                if (!response.ok) {
+                                    throw new Error(`列表读取失败（${response.status}）`);
+                                }
+
+                                const lines = (await response.text())
+                                    .split(/\r?\n/)
+                                    .map((line) => line.trim())
+                                    .filter((line) => line && !line.startsWith("#"));
+                                let invalidCount = 0;
+                                const items = [];
+
+                                lines.forEach((line) => {
+                                    const fields = line.split("|").map((field) => field.trim());
+                                    const dateRange = (fields[1] || "").match(
+                                        /^(\d{4}-\d{2}-\d{2})\s*\/\s*(\d{4}-\d{2}-\d{2})$/
+                                    );
+                                    let url;
+                                    try {
+                                        url = new URL(fields[2] || "");
+                                    } catch {
+                                        url = null;
+                                    }
+
+                                    const item = {
+                                        title: (fields[0] || "").replace(/^--\s*/, ""),
+                                        startDate: dateRange?.[1] || "",
+                                        endDate: dateRange?.[2] || "",
+                                        url: url && (url.protocol === "https:" || url.protocol === "http:")
+                                            ? url.href
+                                            : ""
+                                    };
+                                    if (!item.title || !dateRange || !parseDate(item.startDate)
+                                        || !parseDate(item.endDate) || !item.url) {
+                                        invalidCount++;
+                                        return;
+                                    }
+                                    items.push(item);
+                                });
+
+                                renderQuestionnaires(items, invalidCount);
+                            } catch (error) {
+                                count.textContent = "暂时无法读取";
+                                status.textContent = `无法读取问卷列表：${error.message}`;
+                            }
+                        }
+
+                        loadQuestionnaires();
+                        window.setInterval(loadQuestionnaires, 5 * 60 * 1000);
+                        document.addEventListener("visibilitychange", function () {
+                            if (!document.hidden) loadQuestionnaires();
+                        });
+                        const nextMidnight = new Date();
+                        nextMidnight.setHours(24, 0, 0, 0);
+                        window.setTimeout(loadQuestionnaires, nextMidnight.getTime() - Date.now());
+                    })();
                 </script>
                 <div class="glass-card hitokoto-card" data-astro-cid-4ynrdyaf>
                     <div class="hitokoto-content" data-astro-cid-4ynrdyaf>
