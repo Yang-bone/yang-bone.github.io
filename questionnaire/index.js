@@ -43,7 +43,10 @@ function getLocalDateString(date) {
 
 function renderQuestionnaires(items, invalidCount) {
   const today = getLocalDateString(new Date());
-  const activeItems = items.filter((item) => item.startDate <= today && today <= item.endDate);
+  const activeItems = items.filter((item) => {
+    const cookieName = getCompletionCookieName(item);
+    return item.startDate <= today && today <= item.endDate && !hasCompletionCookie(cookieName);
+  });
   listElement.replaceChildren(...activeItems.map(createQuestionnaireItem));
 
   if (activeItems.length === 0) {
@@ -110,8 +113,9 @@ function createQuestionnaireItem(item) {
     const cookieName = getCompletionCookieName(item);
     const updateCompletion = () => {
       const isComplete = hasCompletionCookie(cookieName);
-      completionLabel.textContent = isComplete ? "已填写（手动标记）" : "";
+      completionLabel.textContent = isComplete ? "已完成" : "";
       completionButton.textContent = isComplete ? "撤销标记" : "我已填写";
+      completionButton.classList.toggle("is-complete", isComplete);
       completionButton.setAttribute("aria-pressed", String(isComplete));
     };
 

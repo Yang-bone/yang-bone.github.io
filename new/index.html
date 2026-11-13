@@ -33,7 +33,17 @@
         body {
             -webkit-font-smoothing: antialiased;
             color: var(--text-normal);
-            background-color: var(--background-base)
+            background-color: var(--background-base);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar,
+        *::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
         }
 
         input,
@@ -861,6 +871,37 @@
             color: var(--text-primary);
         }
 
+        .questionnaire-panel-item.done {
+            background: rgba(34, 197, 94, 0.08);
+            border-radius: 8px;
+            padding: 8px 10px;
+            border-top: 0;
+        }
+
+        .questionnaire-panel-item.done strong {
+            color: #6ee7a9;
+        }
+
+        .questionnaire-panel-item.done .questionnaire-done-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            color: #8ef0ba;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .questionnaire-panel-item.done .questionnaire-done-tag::before {
+            content: "✓";
+            margin-right: 4px;
+            font-weight: 700;
+        }
+
         .questionnaire-panel-status {
             margin: 0;
             padding: 0 14px 14px;
@@ -1216,9 +1257,11 @@
                                 String(now.getMonth() + 1).padStart(2, "0"),
                                 String(now.getDate()).padStart(2, "0")
                             ].join("-");
-                            const activeItems = items.filter((item) =>
+                            const eligibleItems = items.filter((item) =>
                                 item.startDate <= today && today <= item.endDate
                             );
+                            const completedItems = eligibleItems.filter(isMarkedComplete);
+                            const activeItems = eligibleItems.filter((item) => !isMarkedComplete(item));
 
                             count.textContent = activeItems.length
                                 ? `${activeItems.length} 份可填写`
@@ -1226,7 +1269,9 @@
                             list.replaceChildren();
 
                             if (!activeItems.length) {
-                                status.textContent = "目前没有可填写的问卷。";
+                                status.textContent = completedItems.length
+                                    ? `${completedItems.length} 份已完成，已自动隐藏。可在问卷页撤销标记后再显示。`
+                                    : "目前没有可填写的问卷。";
                             } else {
                                 status.textContent = "";
                             }
@@ -1246,8 +1291,19 @@
                                 link.href = item.url;
                                 link.target = "_blank";
                                 link.rel = "noopener noreferrer";
-                                link.textContent = isMarkedComplete(item) ? "已填写（手动标记）" : "填写问卷";
+                                link.textContent = "填写问卷";
+
+                                const doneTag = document.createElement("span");
+                                doneTag.className = "questionnaire-done-tag";
+                                doneTag.textContent = "已完成";
+
                                 row.append(details, link);
+                                if (isMarkedComplete(item)) {
+                                    row.classList.add("done");
+                                    row.append(doneTag);
+                                } else {
+                                    row.append(link);
+                                }
                                 list.append(row);
                             });
 

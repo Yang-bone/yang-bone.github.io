@@ -127,6 +127,24 @@ h2 {
   color: #38734a;
   font-size: 13px;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.questionnaire-completion-label::before {
+  content: "✓";
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
 }
 
 .questionnaire-completion-button {
@@ -141,8 +159,18 @@ h2 {
   cursor: pointer;
 }
 
+.questionnaire-completion-button.is-complete {
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  border-color: #16a34a;
+  color: #fff;
+}
+
 .questionnaire-completion-button:hover {
   background: #f5f5f3;
+}
+
+.questionnaire-completion-button.is-complete:hover {
+  background: linear-gradient(180deg, #16a34a, #15803d);
 }
 
 .questionnaire-completion-button:focus-visible {
